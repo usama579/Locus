@@ -95,10 +95,8 @@ const styles = StyleSheet.create({
 
   cardImage: {
     width: wp("45%"),
-    height: hp("15%%"),
+    height: hp("15%"),
     borderRadius: 12,
-    resizeMode: "cover",
-    overflow: "hidden",
   },
 
   cardTextTitle: {

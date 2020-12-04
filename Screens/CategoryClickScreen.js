@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   StyleSheet,
   TextInput,
   Image,
   View,
+  FlatList,
   Platform,
   StatusBar,
   TouchableWithoutFeedback,
@@ -29,7 +30,9 @@ import tandoor from "../assets/tandoor.png";
 import cafe from "../assets/cafe.png";
 import spice from "../assets/spice.png";
 import hardees from "../assets/hardees.png";
-
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import '@react-native-firebase/database';
 //star
 import star from "../assets/icons/star.png";
 import halfstar from "../assets/icons/halfstar.png";
@@ -49,11 +52,27 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
 
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [detailActivity, setDetailActivity] = useState([]);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
+
+  fetchDetailActivity = async ()=>{
+    let allDetail=[];
+    firebase.database().ref('Activities/'+title+'/Venues').on('value', (snapshot)=> {
+            snapshot.forEach((childSnapshot)=> {
+            let item = childSnapshot.val();
+            allDetail.push(item);
+        });
+        setDetailActivity(allDetail)
+      })
+    
+    } 
+
+  useEffect(()=>{
+       fetchDetailActivity()
+    },[])
 
   if (!loaded) {
     return <AppLoading />;
@@ -91,7 +110,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
         </View>
       </View>
 
-      <ScrollView style={{ zIndex: -5 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ zIndex: -5 }}  showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.titleContainer}>
             <TouchableWithoutFeedback
@@ -102,180 +121,34 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
 
             <Text style={styles.Recomend}>{title}</Text>
           </View>
-          <ScrollView
-            style={{ marginTop: hp("-5%") }}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
+          
+          <FlatList
+          data={detailActivity}
+          renderItem={({item}) =>{
+            const {image,name}=item
+            console.log("componentDidMount on detail catagory",image) 
+          return (
             <View style={styles.cardFirstRow}>
               <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
+                image={image}
+                title={name}
                 heart={emptyheart}
                 onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-
-              <HomeCard
-                image={kabab}
-                title="Kababjees"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-              <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                  navigation.navigate("ActivityInformationScreen",{
+                    object: item,
+                  }) 
+               }
               />
             </View>
-          </ScrollView>
-        </View>
-
-        {/* Second Cards rows */}
-        <View>
-          <ScrollView
-            style={{ marginTop: hp("0%") }}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            <View style={styles.cardFirstRow}>
-              <HomeCard
-                image={tandoor}
-                title="Tandoor"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-
-              <HomeCard
-                image={cafe}
-                title="Cafe Bogie"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-              <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Third Cards rows */}
-
-        <View>
-          <ScrollView
-            style={{ marginTop: hp("0%") }}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            <View style={styles.cardFirstRow}>
-              <HomeCard
-                image={spice}
-                title="Spice"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-
-              <HomeCard
-                image={hardees}
-                title="Hardees"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-              <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-            </View>
-          </ScrollView>
+           )
+          }
+          }
+          extraData={detailActivity}
+          numColumns={3}
+          keyExtractor={(item, index) => index}
+        />
         </View>
       </ScrollView>
-
       {/*Filter Modal */}
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -389,7 +262,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
     marginHorizontal: wp("5%"),
-    marginVertical: hp("4%"),
+    marginTop: hp("4%"),
     bottom: hp("1.3%"),
   },
 

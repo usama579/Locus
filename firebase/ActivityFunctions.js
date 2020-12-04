@@ -3,13 +3,15 @@ import 'firebase/auth';
 import '@react-native-firebase/database';
 
 export async function getAllActvities(){
-    let allNotes={};
+    // let allNotes={};
+    let todosKeys=[];
     firebase.database().ref('Activities').on('value', (snapshot)=> {
-        console.log(`snapshot value is: ${snapshot.val()}`);
-        let data = snapshot.val() ? snapshot.val() : {};
-        let todoItems = {...data};
-        allNotes=todoItems;
+        // console.log(`snapshot value is: ${snapshot.val()}`);
+        // let data = snapshot.val() ? snapshot.val() : {};
+        // let todoItems = {...data};
+        // allNotes=todoItems;
+        todosKeys = Object.keys(snapshot.val());
         });
          
-    return allNotes;
+    return todosKeys;
 }

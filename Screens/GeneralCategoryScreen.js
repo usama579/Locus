@@ -10,6 +10,7 @@ import {
   Text,
   Modal,
   Alert,
+  FlatList,
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
@@ -50,21 +51,31 @@ import {getAllActvities} from "../firebase/ActivityFunctions"
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
 import CityPicker2 from "../Components/CityPicker2";
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import '@react-native-firebase/database';
 
 export default function GeneralCategoryScreen({ navigation }) {
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  let Activities;
+  const [activity, setActivity] = useState([]);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-    
+
+    fetchActivity = async ()=>{
+      firebase.database().ref('Activities').on('value', (snapshot)=> {
+     //const response = await getAllActvities()
+     console.log("componentDidMount on catagory")
+      let todosKeys=Object.keys(snapshot.val());
+      setActivity(todosKeys)
+    });
+        // setActivity(response) 
+    }
+
     useEffect(()=>{
-        console.log("componentDidMount on catagory")
-        getAllActvities().then((res)=>{
-          Activities=res
-         }).catch(e=>{alert("Error:",e)})
+         fetchActivity()
       },[])
 
   if (!loaded) {
@@ -111,171 +122,28 @@ export default function GeneralCategoryScreen({ navigation }) {
         </View>
        
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.catRow1}>
+      <FlatList
+          data={activity}
+          renderItem={({ item }) => (
+          <View style={styles.catRow2}>
           <CategoryBox
             centerImage={centerImage}
             backImage={backImage}
-            text={"Cafaes"}
+            text={item}
             onPress={() =>
               navigation.navigate("CategoryClickScreen", {
-                title: "Cafes",
+                title: item,
               })
             }
           />
+          </View>
+          )
+          }
+          extraData={activity}
+          numColumns={2}
+          keyExtractor={(item, index) => index}
+        />
 
-          <CategoryBox
-            centerImage={art}
-            backImage={artImage}
-            text="Art Galleries"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Art Galleries",
-              })
-            }
-          />
-        </View>
-
-        <View style={styles.catRow2}>
-          <CategoryBox
-            centerImage={resto}
-            backImage={RestoImage}
-            text="Resturents"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Resturents",
-              })
-            }
-          />
-
-          <CategoryBox
-            centerImage={centerImage}
-            backImage={ShopImage}
-            text="Shopping Malls"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Shopping Malls",
-              })
-            }
-          />
-        </View>
-
-        <View style={styles.catRow2}>
-          <CategoryBox
-            centerImage={sports}
-            backImage={SportsImage}
-            text="Campgrounds"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Campgrounds",
-              })
-            }
-          />
-
-          <CategoryBox
-            centerImage={sight}
-            backImage={SightImage}
-            text="Tourist Attraction"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Tourist Attraction",
-              })
-            }
-          />
-        </View>
-        <View style={styles.catRow2}>
-          <CategoryBox
-            centerImage={resto}
-            backImage={RestoImage}
-            text="Bowling Alleys"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Bowling Alleys",
-              })
-            }
-          />
-
-          <CategoryBox
-            centerImage={centerImage}
-            backImage={ShopImage}
-            text="Gyms"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Gyms",
-              })
-            }
-          />
-        </View>
-        <View style={styles.catRow2}>
-          <CategoryBox
-            centerImage={sports}
-            backImage={SportsImage}
-            text="Libraries"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Libraries",
-              })
-            }
-          />
-
-          <CategoryBox
-            centerImage={sight}
-            backImage={SightImage}
-            text="Movie Theaters"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Movie Theaters",
-              })
-            }
-          />
-        </View>
-        <View style={styles.catRow2}>
-          <CategoryBox
-         centerImage={centerImage}
-         backImage={backImage}
-            text="Parks"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Parks",
-              })
-            }
-          />
-
-          <CategoryBox
-           centerImage={art}
-           backImage={artImage}
-            text="Parks"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Parks",
-              })
-            }
-          />
-        </View>
-        <View style={styles.catRow2}>
-          <CategoryBox
-            centerImage={resto}
-            backImage={RestoImage}
-            text="Events"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "Events",
-              })
-            }
-          />
-
-          <CategoryBox
-            centerImage={centerImage}
-            backImage={ShopImage}
-            text="All"
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: "All",
-              })
-            }
-          />
-        </View>
-      </ScrollView>
 
       {/*Filter Modal */}
 
@@ -413,8 +281,8 @@ const styles = StyleSheet.create({
   },
 
   catRow2: {
-    flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
+    alignSelf:"center",
     justifyContent: "space-evenly",
     marginTop: hp("1%"),
   },

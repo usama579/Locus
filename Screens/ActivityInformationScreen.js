@@ -25,7 +25,7 @@ import {
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
 import ActivityCard from "../Components/ActivityCard";
-
+import { Rating } from 'react-native-ratings';
 import Boy from "../assets/boy.png";
 import Girl from "../assets/girl.png";
 
@@ -57,13 +57,15 @@ import 'firebase/database';
         'getTrendingVenues': 'https://api.foursquare.com/v2/venues/trending',
     } */
 
-export default function ActivityInformationScreen({ navigation }) {
+export default function ActivityInformationScreen({ navigation, route}) {
+  const { object } = route.params;
+  const {image,name,rating,features}=object
   const [modalVisible, setModalVisible] = useState(false);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-
+  const [feature,setFeature]=useState([]);
   const [placename, setPlacename] = useState("");
   const [placelocation, setPlacelocation] = useState("");
   const [pictureurl, setPicureurl] = useState("");
@@ -71,7 +73,14 @@ export default function ActivityInformationScreen({ navigation }) {
   const [placeid, setPlaceid] = useState("");
   const [venues, setVenueState] = useState([]);  
 
- 
+  useEffect(()=>{
+       let list=[];
+       list=Object.values(features)
+       setFeature(list) 
+       console.log("features list:",feature)
+    },[])
+
+  
 /*   const NearbyPlaces = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.7136,46.6753&radius=50000&type=campground&key=AIzaSyDgH0ZpaFEJ2HpSRxevHaeTupKpfZlVsBs";
  
   const SearchPlaceURL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=restaurant&inputtype=textquery&fields=photos,formatted_address,name,place_id,geometry&key=AIzaSyDgH0ZpaFEJ2HpSRxevHaeTupKpfZlVsBs";
@@ -202,26 +211,19 @@ export default function ActivityInformationScreen({ navigation }) {
       
         </View>
 
-        <Image source={bella}  style={styles.cardImage}/>
+        <Image source={{uri:image}}  style={styles.cardImage}/>
         <View>
-        <Text style={styles.cardTextTitle}>Placename</Text>
+        <Text style={styles.cardTextTitle}>{name}</Text>
 
          
             <View style={styles.starContainer}>
-              <Image
-                source={starrr}
-                style={{ width:25, height:25}}
+            <Rating
+              type='star'
+              ratingCount={5}
+              imageSize={30}
+              showRating={false}
+              rating={3}
               />
-              <Image
-                source={starrr}
-                style={{ width:25, height:25}}
-              /><Image
-              source={starrr}
-              style={{ width:25, height:25}}
-            /><Image
-            source={starrr}
-            style={{ width:25, height:25}}
-          />
               {/* <Image
                 source={star}
                 style={{ width: wp("3.5%"), height: hp("1.8%") }}
@@ -235,7 +237,7 @@ export default function ActivityInformationScreen({ navigation }) {
                 style={{ width: wp("3.5%"), height: hp("1.8%") }}
               /> */}
 
-              <Text style={styles.ratingText}>4/5</Text>
+            <Text style={styles.ratingText}>{rating}/5</Text>
             </View>
        
 
@@ -261,6 +263,18 @@ export default function ActivityInformationScreen({ navigation }) {
 {/*   <View style={styles.featuresContainer}> */}
            {/*  <Image source={require("../assets/icons/plate2.png")} /> */}
             <Text style={styles.subtitle2}>Features</Text>
+            <FlatList
+            data={feature}
+            renderItem={({item}) =>{
+            return (
+            <View style={styles.subtitle1Container}>
+            <Text>{item}</Text>  
+            </View>
+           )}
+          }
+          extraData={feature}
+          keyExtractor={(item, index) => index}
+            />
          {/*  </View> */}
           {/* <View style={styles.subtitle2Container}>
             <Image source={require("../assets/icons/plate2.png")} />

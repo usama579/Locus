@@ -29,7 +29,7 @@ export default function CategoryBox({ backImage, centerImage, text, onPress }) {
   }
 
   return (
-    <View>
+    <View style={{flex:1,alignSelf:'center',marginHorizontal:"7.5%"}}>
       <TouchableOpacity onPress={onPress}>
         <ImageBackground style={styles.imageContainer} source={backImage}>
           <Image source={centerImage} />
