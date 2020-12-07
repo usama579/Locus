@@ -66,6 +66,7 @@ export default function ActivityInformationScreen({ navigation, route}) {
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
   const [feature,setFeature]=useState([]);
+  const [star,setStar]=useState([]);
   const [placename, setPlacename] = useState("");
   const [placelocation, setPlacelocation] = useState("");
   const [pictureurl, setPicureurl] = useState("");
@@ -78,6 +79,14 @@ export default function ActivityInformationScreen({ navigation, route}) {
        list=Object.values(features)
        setFeature(list) 
        console.log("features list:",feature)
+       const roundValue=Math.round(rating)
+       let i;
+       let ratingList=[];
+       for (i = 0; i < roundValue; i++) {
+        ratingList.push(i)
+       }
+       setStar(ratingList)
+       console.log("star:",star)
     },[])
 
   
@@ -205,64 +214,57 @@ export default function ActivityInformationScreen({ navigation, route}) {
 
 <TouchableWithoutFeedback>
       <View style={styles.container2}>
-
-        
       <View>
-      
         </View>
-
         <Image source={{uri:image}}  style={styles.cardImage}/>
         <View>
         <Text style={styles.cardTextTitle}>{name}</Text>
-
-         
             <View style={styles.starContainer}>
-            <Rating
-              type='star'
-              ratingCount={5}
-              imageSize={30}
-              showRating={false}
-              rating={3}
-              />
-              {/* <Image
-                source={star}
-                style={{ width: wp("3.5%"), height: hp("1.8%") }}
-              />
+            <FlatList
+            contentContainerStyle={styles.starFlatListContainer}
+            data={star}
+            renderItem={() =>{
+            return (
               <Image
-                source={star}
-                style={{ width: wp("3.5%"), height: hp("1.8%") }}
+              source={starrr}
+              style={{ width:20, height:20}}
               />
-              <Image
-                source={star}
-                style={{ width: wp("3.5%"), height: hp("1.8%") }}
-              /> */}
-
+             )}
+             }
+             extraData={star}
+             keyExtractor={(item, index) => index}
+            />
             <Text style={styles.ratingText}>{rating}/5</Text>
             </View>
-       
-
           <View style={styles.subtitle1Container}>
             <Image
               source={require("../assets/icons/locicon.png")}
-              style={{ marginTop: hp("1.5%") ,width:25, height:25, opacity: 0.5}}
+              style={{ marginTop: hp("1.5%") ,width:20, height:20, opacity: 0.5}}
                />
               <Text style={styles.subtitle1}>placelocation</Text>
               
               <TouchableWithoutFeedback>
               <Image
               source={require("../assets/icons/mapping.png")}
-              style={{ marginTop: hp("2.5%") ,width:25, height:25, marginLeft: 'auto'}}
+              style={{ marginTop: hp("2.5%") ,width:20, height:20, marginLeft: 'auto'}}
                />
                </TouchableWithoutFeedback>
           </View>
 
      <View
-     style={{ borderBottomColor: '#8338EB', borderBottomWidth: 3 , paddingTop:20}}>
+     style={{ borderBottomColor: '#8338EB', borderBottomWidth: 3 , paddingTop:10}}>
   </View>
 
 {/*   <View style={styles.featuresContainer}> */}
            {/*  <Image source={require("../assets/icons/plate2.png")} /> */}
-            <Text style={styles.subtitle2}>Features</Text>
+                    </View>
+      </View>
+    </TouchableWithoutFeedback>
+
+     {/*    <Text style={styles.pictures}>Pictures</Text> */}
+
+        <View style={styles.picMainContainer}>
+        <Text style={styles.subtitle2}>Features</Text>
             <FlatList
             data={feature}
             renderItem={({item}) =>{
@@ -293,13 +295,7 @@ export default function ActivityInformationScreen({ navigation, route}) {
             </View>
           </View>
 
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
 
-     {/*    <Text style={styles.pictures}>Pictures</Text> */}
-
-        <View style={styles.picMainContainer}>
         {/*   <View style={styles.picFirstRow}>
             <TouchableOpacity
               onPress={() => {
@@ -432,7 +428,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   picMainContainer: {
-    padding: hp("3%"),
+    paddingHorizontal: hp("3%"),
   },
   review: {
     fontFamily: "MoskBold700",
@@ -514,12 +510,10 @@ const styles = StyleSheet.create({
     marginRight: 3,
   },
   subtitle2: {
-    fontSize: 25,
+    fontSize: 22,
     fontFamily: "MoskBold700",
     marginLeft: wp(".5%"),
     textAlign: 'center',
-    paddingTop:10,
-    
   },
   subtitle2Container: {
     flexDirection: "row",
@@ -537,7 +531,7 @@ const styles = StyleSheet.create({
 
   },
   subtitle1: {
-    fontSize: 21,
+    fontSize: 18,
     fontFamily: "MoskMedium500",
     marginLeft: wp("1%"),
     marginBottom: hp("-1.5%"),
@@ -551,7 +545,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontFamily: "MoskMedium500",
-    fontSize: 20,
+    fontSize: 18,
     color: "black",
     marginLeft: wp("2%"),
     opacity: 0.8,
@@ -560,6 +554,14 @@ const styles = StyleSheet.create({
     
   },
   starContainer: {
+    paddingTop:5,
+    width:"45%",
+    alignSelf:"center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  starFlatListContainer: {
     paddingTop:5,
     flexDirection: "row",
     alignItems: "center",
@@ -574,7 +576,7 @@ const styles = StyleSheet.create({
   cardTextTitle: {
     paddingTop: 5,
     fontFamily: "MoskBold700",
-    fontSize: 30,
+    fontSize: 25,
     textAlign: 'center'
 
   },
@@ -588,7 +590,7 @@ const styles = StyleSheet.create({
   },
   container2: {
     width: wp("87%"),
-    height: hp("51%"),
+    height: hp("48%"),
     backgroundColor: "#fff",
     borderRadius: 12,
     elevation: 3,

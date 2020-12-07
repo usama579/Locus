@@ -40,7 +40,7 @@ export default function HomeCard({
   return (
     <TouchableWithoutFeedback onPress={onPress2}>
       <View style={styles.container}>
-        <Image source={image} style={styles.cardImage} />
+        <Image source={{uri:image}} style={styles.cardImage} />
 
         <View>
           <View style={styles.ratingsContainer}>
