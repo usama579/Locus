@@ -124,27 +124,29 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
           
           <FlatList
           data={detailActivity}
-          renderItem={({item}) =>{
-            const {image,name}=item
-            console.log("componentDidMount on detail catagory",image) 
+          renderItem={({item,index}) =>{
+            // const {image,name}=item
+            console.log("componentDidMount on detail catagory",item.name) 
           return (
-            <View style={styles.cardFirstRow}>
+            // <View style={styles.cardFirstRow}>
               <HomeCard
-                image={image}
-                title={name}
+                image={item.image}
+                title={item.name}
                 heart={emptyheart}
+                item={item}
+                index={index}
                 onPress2={() =>
                   navigation.navigate("ActivityInformationScreen",{
                     object: item,
                   }) 
                }
               />
-            </View>
+            // </View>
            )
           }
           }
           extraData={detailActivity}
-          numColumns={3}
+          numColumns={2}
           keyExtractor={(item, index) => index}
         />
         </View>
@@ -268,9 +270,11 @@ const styles = StyleSheet.create({
 
   cardFirstRow: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
     alignItems: "flex-start",
-    padding: wp("4%"),
+    padding: wp("1.7%"),
+    // backgroundColor:'grey',
+    alignSelf:'center'
   },
 
   othersLike: {

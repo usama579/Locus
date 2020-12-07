@@ -8,6 +8,7 @@ import {
   Image,
   Platform,
   StatusBar,
+  TouchableOpacity
 } from "react-native";
 
 import {
@@ -74,14 +75,15 @@ export default function Welcome({ navigation }) {
         />
 
         <View>
-          <View style={styles.loginButtonContainer}>
+          <TouchableOpacity style={styles.loginButtonContainer}>
+
             <Text
               onPress={() => navigation.navigate("LoginScreen")}
               style={styles.loginText}
             >
               LOGIN
             </Text>
-          </View>
+          </TouchableOpacity>
 
           <Text
             onPress={() => navigation.navigate("SignUpScreen")}

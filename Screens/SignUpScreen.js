@@ -10,7 +10,8 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
-  SafeAreaView} from "react-native";
+  SafeAreaView,
+ScrollView} from "react-native";
 
 import {widthPercentageToDP as wp, heightPercentageToDP as hp,} from "react-native-responsive-screen";
 import { AntDesign } from "@expo/vector-icons";
@@ -251,6 +252,7 @@ export default function SignUpScreen({ navigation }) {
       />
       <Image source={require("../assets/logo.png")} style={styles.logoImage2} />
 {/* Sign Up card --> Sign up section of the page */}
+  <ScrollView>
       <View style={styles.signupCardContainer}>
         <View style={styles.topTextContainer}>
           {/* displaying name of the card */}
@@ -422,6 +424,7 @@ export default function SignUpScreen({ navigation }) {
           <AntDesign name="arrowright" size={16} color="#fff" />
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </ImageBackground>
   );
 }

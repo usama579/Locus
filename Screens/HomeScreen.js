@@ -123,11 +123,11 @@ fetchData();
               <HomeCard
                 image={bella}
                 title="Bella Vita"
-/*                 star1={star}
+               star1={star}
                 star2={star}
                 star3={star}
                 star4={star}
-                star5={halfstar} */
+                star5={halfstar}
                // subTitle1="Khayaban shahbaz (Karachi)"
             //    subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}

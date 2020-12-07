@@ -1,71 +1,114 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-
+import {getUserId} from '../apis/LocalDB'
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { onChange } from "react-native-reanimated";
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import '@react-native-firebase/database';
+// import { TouchableOpacity } from "react-native-gesture-handler";
+
 
 export default function HomeCard({
+  item,
   image,
   title,
-  star1,
+  index,
   star2,
   star3,
   star4,
   star5,
- /*  subTitle1,
-  subTitle2, */
   heart,
   onPress2,
 }) {
+  saveBookmarks = (bookmarkItems) => {
+    let allDetail=[];
+    var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+    // var bookmarkPush = bookmark.push();
+    bookmark.set(bookmarkItems)
+    .then(()=>{
+      console.log('success')
+    }).catch(()=>{
+      console.log('error')
+    })
+    console.log('21312312412',bookmarkItems)
+        // setDetailActivity(allDetail)
+    } 
+
+    removeBookmark = (bookmarkItems) =>{
+      var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+      bookmark.remove().then(()=>{
+        console.log('removed')
+      }).catch(()=>{
+        console.log('error removing')
+      })
+    }
+
+    useEffect(()=>{
+      getUserId(user);
+      console.log('item')
+   },[])
+   
+  const user = value => {
+    if (value !== null && value !== '') {
+          console.log('value',value)
+          setUserId(value)
+    }
+  }
+  const [userId, setUserId] = useState()
+  const [bookmark, setBookmark] = useState(false)
+  const [bookmarkItems, setBookmarkItems] = useState([])
+  let bookmarkItemArray = []
+
+const save = item => {
+  if(bookmark != true){
+    // console.log('sads',item.name)
+      // bookmarkItemArray.push(item.name)
+      // setBookmarkItems(...bookmarkItems,item.name)
+      saveBookmarks(item)
+      // console.log('select',bookmarkItems)
+      console.log('select',bookmarkItems)
+
+
+  }
+  else{
+    removeBookmark(item);
+    console.log('unselect',bookmarkItems)
+  }
+}
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-
+ 
   if (!loaded) {
     return <AppLoading />;
   }
 
   return (
-    <TouchableWithoutFeedback onPress={onPress2}>
+    <TouchableOpacity onPress={onPress2}>
       <View style={styles.container}>
-        <Image source={image} style={styles.cardImage} />
+        <Image source={image} style={styles.cardImage} resizeMode={"contain"}/>
 
         <View>
           <View style={styles.ratingsContainer}>
-            <Text style={styles.cardTextTitle}>{title}</Text>
+            <Text numberOfLines = {1} style={styles.cardTextTitle}>{title}</Text>
 
             <View style={styles.starContainer}>
-{/*               <Image source={star1} />
-              <Image source={star2} />
-              <Image source={star3} />
-              <Image source={star4} />
-              <Image source={star5} /> */}
 
-              {/* <Text style={styles.ratingText}>4.5/5</Text> */}
             </View>
           </View>
-
-        {/*   <View style={styles.subtitle1Container}>
-            <Image source={require("../assets/icons/location.png")} />
-            <Text style={styles.subtitle1}>{subTitle1}</Text>
-          </View>
-
-          <View style={styles.subtitle2Container}>
-            <Image source={require("../assets/icons/plate.png")} />
-            <Text style={styles.subtitle2}>{subTitle2}</Text>
-          </View> */}
 
           <View style={styles.subtitle3Container}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -73,24 +116,31 @@ export default function HomeCard({
               <Image source={require("../assets/icons/down-arrow.png")} />
             </View>
 
-            <TouchableOpacity>
-              <Image source={heart} />
+            <TouchableOpacity 
+                    onPress={() => {
+                        setBookmark(!bookmark);
+                        console.log(bookmark)
+      save(item)
+                   
+                    }}>
+              <Image source={heart} style={{height:20,width:20,resizeMode:'contain',tintColor: bookmark === true ? 'red' : null}} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: wp("45%"),
-    height: hp("24%"),
+    width: wp("44.5%"),
+    // height: hp("24%"),
     backgroundColor: "#fff",
-    marginRight: wp("3%"),
+    margin: wp("3%"),
     borderRadius: 12,
     elevation: 5,
+    // padding:wp('2%')
   },
 
   cardImage: {
@@ -101,15 +151,16 @@ const styles = StyleSheet.create({
 
   cardTextTitle: {
     fontFamily: "MoskBold700",
-    fontSize: 20,
+    fontSize: wp('4%'),
     color: "#454F63",
+    marginRight:5
   },
 
   ratingsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: hp("1%"),
+    // flexDirection: "row",
+    alignItems: 'flex-start',
+    // justifyContent: "space-between",
+    margin: 5,
   },
 
   starContainer: {
@@ -159,7 +210,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: wp("2%"),
-    marginTop: hp(".5%"),
+    marginVertical: hp(".5%"),
     justifyContent: "space-between",
   },
 });

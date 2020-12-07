@@ -47,7 +47,7 @@ import shop from "../assets/icons/shopping.png";
 
 import SportsImage from "../assets/sportsImage.png";
 import sports from "../assets/icons/sports.png";
-import {getAllActvities} from "../firebase/ActivityFunctions"
+// import {getAllActvities} from "../apis/ActivityFunctions"
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
 import CityPicker2 from "../Components/CityPicker2";

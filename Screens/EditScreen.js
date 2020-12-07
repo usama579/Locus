@@ -29,7 +29,7 @@ import female from "../assets/icons/female2.png";//GenderImages
 
 
 import { ScrollView } from "react-native-gesture-handler";
-
+import {removeIdFromLocalDb} from '../apis/LocalDB'
 
 
 import * as firebase from 'firebase/app';
@@ -61,6 +61,7 @@ const [values, setvalues] = useState([]);
   SignOut = async() => {
     try{
   await firebase.auth().signOut()
+  removeIdFromLocalDb()
     navigation.navigate("Welcome")
   }catch(error){
   alert('Unable to Sign Out right now!');
@@ -68,16 +69,16 @@ const [values, setvalues] = useState([]);
 
 
 
-  var user = firebase.auth().currentUser;
+  // var user = firebase.auth().currentUser;
 
-  firebase.database().ref('user').child(user.uid).once('value').then((snapshot) => {
+  // firebase.database().ref('user').child(user.uid).once('value').then((snapshot) => {
 
-    snapshot.forEach((child) => {
-      values.push(child.val());
-    });
+  //   snapshot.forEach((child) => {
+  //     values.push(child.val());
+  //   });
     //alert(values[1]);
     // var city= values[1];  var email =values[2]; var gender =values[3]; var nickname = values[4];
-  });
+  // });
 
 
 

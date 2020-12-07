@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -9,10 +9,11 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   Text,
-  Modal,
+  FlatList,
   TouchableOpacity,
 } from "react-native";
 import Header from "../Components/Header";
+import { useFocusEffect } from '@react-navigation/native';
 
 import {
   widthPercentageToDP as wp,
@@ -45,10 +46,60 @@ import HomeCard from "../Components/HomeCard";
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
 import PriceSegment from "../Components/PriceSegment";
+import {getUserId} from '../apis/LocalDB'
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import '@react-native-firebase/database';
 
-export default function FavoriteScreen({ navigation, route }) {
-  const [pass, setPass] = useState("");
+export default function FavoriteScreen({ navigation }) {
+   fetchBookmarks = async ()=>{
+     console.log('call')
+    let allBookmarks=[];
+    let fetch = firebase.database().ref('user/'+userId).child('/bookmarks/');
+    fetch.on('value', (snapshot)=> {
+            snapshot.forEach((childSnapshot)=> {
+            let item = childSnapshot.val();
+            let key = Object.keys(item)
+            // console.log('itemsss',key)
+            allBookmarks.push(item);
+        });
+        setBookmarkItems(allBookmarks)
+        console.log(bookmarkItems.length)
+      })
+    
+    } 
+    removeBookmark = (bookmarkItems) =>{
+      var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+      bookmark.remove().then(()=>{
+        console.log('removed')
+        fetchBookmarks()
+      }).catch(()=>{
+        console.log('error removing')
+      })
+    }
+  
+  //  useEffect(()=>{
+  //      getUserId(user)
+  //   },[])
+    useFocusEffect(
+      React.useCallback(() => {
+        getUserId(user)
 
+      }, [])
+    );
+
+   const user = value => {
+      if (value !== null && value !== '') {
+            console.log('valuefavyuyuy',value)
+            setUserId(value)
+              fetchBookmarks()
+      }
+    }
+  
+    const [userId, setUserId] = useState()
+  const [bookmark, setBookmark] = useState(true)
+  const [bookmarkItems, setBookmarkItems] = useState([])
+  const bookmarkItemArray = []
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -61,130 +112,83 @@ export default function FavoriteScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
-
-      <ScrollView style={{ zIndex: -5 }} showsVerticalScrollIndicator={false}>
-        <View>
           <View style={styles.titleContainer}>
             <Text style={styles.Recomend}>Favorites</Text>
           </View>
-          <View style={{ marginTop: hp("-5%") }}>
-            <View style={styles.cardFirstRow}>
+          <ScrollView>
+          {/* <FlatList
+          data={bookmarkItems}
+          renderItem={({item,index}) =>{
+            const {image,name}=item
+            console.log("componentDidMount on detail catagory",name) 
+          return (
+            // <View style={styles.cardFirstRow}>
               <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
+                image={item.image}
+                title={item.name}
                 heart={Heart2}
+                item={item}
+                index={index}
                 onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                  navigation.navigate("ActivityInformationScreen",{
+                    object: item,
+                  }) 
+               }
               />
-
-              <HomeCard
-                image={kabab}
-                title="Kababjees"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={Heart2}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
+            // </View>
+           )
+          }
+          }
+          extraData={bookmarkItems}
+          numColumns={2}
+          keyExtractor={(item, index) => index}
+        /> */}
+          <FlatList
+          data={bookmarkItems}
+          renderItem={({item,index}) =>{
+          return (
+            <TouchableOpacity onPress={() =>
+              navigation.navigate("ActivityInformationScreen",{
+                object: item,
+              })}>
+            <View style={styles.container1}>
+              <Image source={item.image} style={styles.cardImage} resizeMode={"contain"}/>
+      
+              <View>
+                <View style={styles.ratingsContainer}>
+                  <Text numberOfLines = {1} style={styles.cardTextTitle}>{item.name}</Text>
+      
+                  <View style={styles.starContainer}>
+      
+                  </View>
+                </View>
+      
+                <View style={styles.subtitle3Container}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text style={styles.subtitle3}>More Informatiom</Text>
+                    <Image source={require("../assets/icons/down-arrow.png")} />
+                  </View>
+      
+                  <TouchableOpacity 
+                          onPress={() => {
+                            removeBookmark(item)
+                          }}>
+                    <Image source={emptyheart} style={{height:20,width:20,resizeMode:'contain',tintColor:'red'}} />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-
-        {/* Second Cards rows */}
-        <View>
-          <View style={{ marginTop: hp("0%") }}>
-            <View style={styles.cardFirstRow}>
-              <HomeCard
-                image={tandoor}
-                title="Tandoor"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={Heart2}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-
-              <HomeCard
-                image={cafe}
-                title="Cafe Bogie"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={Heart2}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-            </View>
-          </View>
-        </View>
-
-        {/* Third Cards rows */}
-
-        <View>
-          <View style={{ marginTop: hp("0%") }}>
-            <View style={styles.cardFirstRow}>
-              <HomeCard
-                image={spice}
-                title="Spice"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={Heart2}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-
-              <HomeCard
-                image={hardees}
-                title="Hardees"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={Heart2}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
-              />
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+          </TouchableOpacity>      
+           )
+          }
+          }
+          // extraData={detailActivity}
+          numColumns={2}
+          // keyExtractor={(item, index) => index}
+        />   
+        </ScrollView>  
+        </SafeAreaView>
+        );
 }
 
 const styles = StyleSheet.create({
@@ -194,31 +198,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
 
-  searchContainer: {
-    width: wp("90%"),
-    height: hp("5%"),
-    backgroundColor: "#fff",
-    elevation: 5,
-    borderRadius: 30,
-    alignSelf: "center",
-    justifyContent: "space-between",
-    padding: wp("5%"),
-    marginTop: hp("5%"),
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  searchSubContainer: {
-    flexDirection: "row",
-  },
-
-  inputpass: {
-    width: wp("70%"),
-    height: hp("2.5%"),
-    paddingHorizontal: wp("3%"),
-    fontSize: 10,
-    fontFamily: "MoskMedium500",
-  },
-
+  
   Recomend: {
     fontFamily: "MoskBold700",
     color: "#8338EB",
@@ -233,63 +213,84 @@ const styles = StyleSheet.create({
     bottom: hp("1.3%"),
   },
 
-  cardFirstRow: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
-    padding: wp("4%"),
-    left: wp("2%"),
-  },
-
-  othersLike: {
-    fontFamily: "MoskBold700",
-    color: "#8338EB",
-    fontSize: 16,
-    marginVertical: wp("0%"),
-    marginHorizontal: wp("7%"),
-  },
-
-  modalView: {
-    width: "100%",
-    height: "80%",
-    marginTop: "60%",
-    backgroundColor: "#7D34E3",
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  container1: {
+    width: wp("44.5%"),
+    // height: hp("24%"),
+    backgroundColor: "#fff",
+    margin: wp("3%"),
+    borderRadius: 12,
     elevation: 5,
-  },
-  openButton: {
-    backgroundColor: "orange",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    bottom: hp("3%"),
-  },
-  textStyle: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
+    // padding:wp('2%')
   },
 
-  bottomText: {
-    marginTop: hp("0.8%"),
-    color: "#D6D6D8",
-    fontSize: wp("3.5%"),
+  cardImage: {
+    width: wp("45%"),
+    height: hp("15%"),
+    borderRadius: 12,
   },
-  text1View: {
-    width: wp("50%"),
-    marginLeft: wp("4%"),
+
+  cardTextTitle: {
+    fontFamily: "MoskBold700",
+    fontSize: wp('4%'),
+    color: "#454F63",
+    marginRight:5
   },
-  pdf: {
-    color: "#D6D6D8",
+
+  ratingsContainer: {
+    // flexDirection: "row",
+    alignItems: 'flex-start',
+    // justifyContent: "space-between",
+    margin: 5,
+  },
+
+  starContainer: {
+    flexDirection: "row",
+  },
+  ratingText: {
+    fontFamily: "MoskMedium500",
+    fontSize: 10,
+    color: "#454F63",
+    marginLeft: wp("2%"),
+    opacity: 0.8,
+  },
+  subtitle1Container: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: wp("2%"),
+    marginTop: hp("-.4%"),
+  },
+
+  subtitle1: {
+    fontSize: 12,
+    fontFamily: "MoskMedium500",
+    marginLeft: wp(".5%"),
+  },
+
+  subtitle2Container: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: wp("2%"),
+    marginTop: hp(".1.5%"),
+  },
+
+  subtitle2: {
+    fontSize: 12,
+    fontFamily: "MoskMedium500",
+    marginLeft: wp(".5%"),
+  },
+
+  subtitle3: {
+    fontSize: 10,
+    fontFamily: "MoskMedium500",
+    marginLeft: wp(".5%"),
+    marginRight: 3,
+  },
+
+  subtitle3Container: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: wp("2%"),
+    marginVertical: hp(".5%"),
+    justifyContent: "space-between",
   },
 });

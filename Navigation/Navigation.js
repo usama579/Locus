@@ -3,6 +3,7 @@ import { View, Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Welcome from "../Screens/Welcome";
+import Splash from '../Screens/Splash'
 import LoginScreen from "../Screens/LoginScreen";
 import SignUpScreen from "../Screens/SignUpScreen";
 import InterestsScreen from "../Screens/InterestsScreen";
@@ -155,7 +156,8 @@ function FavCat() {
 function Navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator headerMode="none" initialRouteName={Welcome}>
+      <Stack.Navigator headerMode="none" initialRouteName={Splash}>
+      <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Welcome" component={Welcome} />
         <Stack.Screen name="HomeScreen" component={MyTabs} />
         <Stack.Screen

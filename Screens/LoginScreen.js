@@ -22,6 +22,7 @@ import { AppLoading } from "expo";
 
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import { saveUserId } from "../apis/LocalDB";
 
 export default function LoginScreen({ navigation }) {
   //user attributes
@@ -48,7 +49,9 @@ export default function LoginScreen({ navigation }) {
         //cheack if the user is verfied 
         const response = await firebase.auth().signInWithEmailAndPassword(mail ,pass);
         if (response){
-          
+          console.log(response.user.uid)
+          userId = response.user.uid
+          saveUserId(userId)
         navigation.navigate('HomeScreen')
         
         }
