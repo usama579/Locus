@@ -99,7 +99,9 @@ const save = item => {
   return (
     <TouchableOpacity onPress={onPress2}>
       <View style={styles.container}>
-        <Image source={image} style={styles.cardImage} resizeMode={"contain"}/>
+
+        <Image source={{uri:image}} style={styles.cardImage} resizeMode={"contain"}/>
+
 
         <View>
           <View style={styles.ratingsContainer}>
