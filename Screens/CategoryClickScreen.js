@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Header from "../Components/Header";
-
+import { Icon,Picker } from "native-base";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -46,17 +46,16 @@ import HomeCard from "../Components/HomeCard";
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
 import PriceSegment from "../Components/PriceSegment";
-import CityPicker2 from "../Components/CityPicker2";
 import {getUserId} from '../apis/LocalDB'
 export default function CategoryClickScreen({ navigation, route, onPress2 }) {
   const { title } = route.params;
-
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [detailActivity, setDetailActivity] = useState([]);
-
+  const [customDetailActivity, setCustomDetailActivity] = useState([]);
   const [userId, setUserId] = useState()
   const [unbookmarked, setUnBookmarked] = useState(false)
+  const [selected,setSelected] = useState("Asc")
   const [bookmarkedItems, setBookmarkedItems] = useState([])
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
@@ -105,6 +104,32 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
 
   if (!loaded) {
     return <AppLoading />;
+  }
+
+  onValueChange=(value)=> {
+    console.log('value:',value)
+    let array=detailActivity
+      if(value == 'Asc'){
+        setSelected(value)
+        array.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)); 
+        console.log("sorted array 1:",array)
+        //setCustomDetailActivity(array);
+      }
+      else if(value == 'Dsc'){
+        setSelected(value)
+        array.sort((a,b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0)); 
+        console.log("sorted array 2:",array)
+        //setCustomDetailActivity(array);
+      }
+      else if(value == 'Nearest'){
+        setSelected(value)
+        //setCustomDetailActivity();
+      }
+      else if(value == 'Furthest'){
+        setSelected(value)
+        //setCustomDetailActivity();
+      }
+      
   }
 
   return (
@@ -214,8 +239,18 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
             <View style={styles.passwordContainer}>
             <View style={styles.passwordSubContainer}>
              
+            <Picker mode="dropdown"  
+              iosIcon={<Icon name="arrow-down" />}
+              style={{ width: undefined,color:"#fff" }}
+              selectedValue={selected}
+              onValueChange={onValueChange}
+            >
+              <Picker.Item label="Asc" value="Asc" />
+              <Picker.Item label="Dsc" value="Dsc" />
+              <Picker.Item label="Nearest" value="Nearest" />
+              <Picker.Item label="Furthest" value="Furthest" />
+            </Picker>
 
-              <CityPicker2  color="#fff"/>
             </View>
           </View>
 
@@ -233,7 +268,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
             </View>
 
             <View style={{ flexDirection: "row" }}>
-              <ModalButtons title="Outdoors seatings" />
+              <ModalButtons title="Outdoors seatings"/>
               <ModalButtons2 title="Live music" />
               <ModalButtons2 title="Delivery" />
             </View>
