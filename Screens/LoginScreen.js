@@ -9,6 +9,7 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -31,7 +32,7 @@ export default function LoginScreen({ navigation }) {
   //Error attributes
   const [errorpass, seterrorPass] = useState("");
   const [errormail, seterrorMail] = useState("");
-  
+  const [loading, setLoading] = useState()
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -44,14 +45,17 @@ export default function LoginScreen({ navigation }) {
   // sign in function
   const user = firebase.auth().currentUser; 
   fSignIn = async () => {
+    setLoading(true)
     if( mail && pass ){
       try{
         //cheack if the user is verfied 
         const response = await firebase.auth().signInWithEmailAndPassword(mail ,pass);
         if (response){
           console.log(response.user.uid)
-          userId = response.user.uid
-          saveUserId(userId)
+          userInfo = response.user
+          console.log('kmsdaklfn',userInfo.DateOfBirth,'name',userInfo.nickname,userInfo.city,userInfo.gender,userInfo.email)
+          saveUserId(userInfo)
+          setLoading(false)
         navigation.navigate('HomeScreen')
         
         }
@@ -174,7 +178,12 @@ export default function LoginScreen({ navigation }) {
             <Image source={require("../assets/icons/twitter.jpg")} />
           </View>
         </View> */}
-
+ {loading ? (
+          <ActivityIndicator
+            //visibility of Overlay Loading Spinner
+            visible={loading}
+          />
+        ) : (
         <TouchableOpacity
           onPress={fSignIn}
           style={styles.cardBottomCircle}
@@ -183,6 +192,7 @@ export default function LoginScreen({ navigation }) {
             <AntDesign name="arrowright" size={16} color="#fff" />
           </View>
         </TouchableOpacity>
+        )}
       </View>
     </ImageBackground>
   );

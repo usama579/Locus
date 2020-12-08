@@ -68,7 +68,10 @@ export default function FavoriteScreen({ navigation }) {
         });
         setBookmarkItems(allBookmarks)
       })
-  
+      if (bookmarkItems.length <= 0){
+        setLoading(false)
+        alert('No Favourites added')
+      }
     } 
     removeBookmark = (bookmarkItems) =>{
       var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);

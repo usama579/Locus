@@ -47,12 +47,12 @@ export default function EditScreen({ navigation }) {
     }, [])
   );
 //user attributes
-const [mail, setMail] = useState("");
-const [nickname, setNickname] = useState("");
-const [pass, setPass] = useState("");
-const [city, setCity] = useState("");
-const [DOB, setDOB] = useState("");
-const [gend, setGend] = useState("");
+const [mail, setMail] = useState();
+const [nickname, setNickname] = useState();
+const [pass, setPass] = useState();
+const [city, setCity] = useState();
+const [DOB, setDOB] = useState();
+const [gend, setGend] = useState();
 const [userId, setUserId] = useState()
 const [values, setvalues] = useState([]);
 
@@ -77,19 +77,18 @@ const [values, setvalues] = useState([]);
   }}
 
   fetchUserInfo = () =>{
+    let item;
     let fetch = firebase.database().ref('user/'+userId);
     fetch.on('value', (snapshot)=> {
-           
-             let item = snapshot.val();
-             let key = Object.keys(item)
-             console.log('itemsss',item)
-              setNickname(item.nickname)
+             item = snapshot.val();
+             console.log('items:',item)
+         });
+         setNickname(item.nickname)
               setMail(item.email)
               setCity(item.city)
               setDOB(item.DateOfBirth)
               setGend(item.gender)
-              console.log('q23q3',nickname,mail,city,DOB,gend)
-         });
+         
   }
 
   const userProfile = value => {
@@ -385,7 +384,7 @@ style = {styles.maleContainer} color="#7D34E3" label="Female" value="Female" />
 
         <View style={{flex: 1, flexDirection: 'row' , alignItems:'center', justifyContent:'center'}}>
         <TouchableOpacity
-          onPress={Edit}
+          
           style={{
             width: wp("30%"),
             height: hp("5%"),

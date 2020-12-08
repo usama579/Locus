@@ -157,7 +157,7 @@ export default function SignUpScreen({ navigation }) {
         seterrorGend("Plaese choose your gender") */
 
  const SSignUp = async () => {
-
+console.log('callde')
   if (!city)
   seterrorCity("Plaese choose your city");
   else
@@ -214,7 +214,7 @@ export default function SignUpScreen({ navigation }) {
                 city:city,
                 gender: gend,
                 DateOfBirth: DOB});
-               
+               console.log('SignUp')
           navigation.navigate("InterestsScreen")
          
       }
@@ -252,7 +252,7 @@ export default function SignUpScreen({ navigation }) {
       />
       <Image source={require("../assets/logo.png")} style={styles.logoImage2} />
 {/* Sign Up card --> Sign up section of the page */}
-  <ScrollView>
+  <ScrollView style={{marginBottom:20}}>
       <View style={styles.signupCardContainer}>
         <View style={styles.topTextContainer}>
           {/* displaying name of the card */}
