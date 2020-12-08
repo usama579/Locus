@@ -40,19 +40,24 @@ import emptystar from "../assets/icons/emptystar.png";
 
 //Hearts
 import emptyheart from "../assets/icons/Heart.png";
+import Heart from "../assets/icons/redHeart.png";
 import { ScrollView } from "react-native-gesture-handler";
 import HomeCard from "../Components/HomeCard";
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
 import PriceSegment from "../Components/PriceSegment";
 import CityPicker2 from "../Components/CityPicker2";
-
+import {getUserId} from '../apis/LocalDB'
 export default function CategoryClickScreen({ navigation, route, onPress2 }) {
   const { title } = route.params;
 
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [detailActivity, setDetailActivity] = useState([]);
+
+  const [userId, setUserId] = useState()
+  const [unbookmarked, setUnBookmarked] = useState(false)
+  const [bookmarkedItems, setBookmarkedItems] = useState([])
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -68,11 +73,35 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
         setDetailActivity(allDetail)
       })
     
-    } 
+    }
+    fetchBookmarks = async ()=>{
+      console.log('call')
+     let allBookmarks=[];
+     let fetch = firebase.database().ref('user/'+userId).child('/bookmarks/');
+     fetch.on('value', (snapshot)=> {
+             snapshot.forEach((childSnapshot)=> {
+             let item = childSnapshot.val();
+             let key = Object.keys(item)
+             // console.log('itemsss',key)
+             allBookmarks.push(item);
+         });
+         setBookmarkedItems(allBookmarks)
+         console.log(bookmarkedItems.length)
+       })
+      } 
 
   useEffect(()=>{
        fetchDetailActivity()
+       getUserId(user);
     },[])
+
+    const user = value => {
+      if (value !== null && value !== '') {
+            console.log('value',value)
+            setUserId(value)
+            fetchBookmarks()
+      }
+    }
 
   if (!loaded) {
     return <AppLoading />;
@@ -125,19 +154,22 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
           <FlatList
           data={detailActivity}
           renderItem={({item,index}) =>{
+            // item search in (bookmarkitem)
+            const response= bookmarkedItems.some((selectedItem)=> selectedItem.name === item.name);
             // const {image,name}=item
-            console.log("componentDidMount on detail catagory",item.name) 
+            console.log("componentDidMount on detail catagory",response) 
           return (
             // <View style={styles.cardFirstRow}>
               <HomeCard
                 image={item.image}
                 title={item.name}
-                heart={emptyheart}
+                heart={response == true ? 'red' : null}
                 item={item}
                 index={index}
                 onPress2={() =>
                   navigation.navigate("ActivityInformationScreen",{
                     object: item,
+                    response:response
                   }) 
                }
               />

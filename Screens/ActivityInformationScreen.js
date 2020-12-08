@@ -45,9 +45,12 @@ import RatingsCard from "../Components/RatingsCard";
 import { useSafeArea } from "react-native-safe-area-context";
 import * as firebase from 'firebase/app';
 import shareicon from "../assets/icons/share.png";
+import { useFocusEffect } from '@react-navigation/native';
+import {getUserId} from '../apis/LocalDB'
 
 import 'firebase/auth';
 import 'firebase/database';
+import { saveUserId } from "../apis/LocalDB";
 
 /*       var endPoints = {
         'getVenueDetailById': 'https://api.foursquare.com/v2/venues/',
@@ -58,8 +61,9 @@ import 'firebase/database';
     } */
 
 export default function ActivityInformationScreen({ navigation, route}) {
-  const { object } = route.params;
+  const { object,response } = route.params;
   const {image,name,rating,features}=object
+  const [bookmark,setBookmark] = useState(response)
   const [modalVisible, setModalVisible] = useState(false);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
@@ -73,12 +77,54 @@ export default function ActivityInformationScreen({ navigation, route}) {
   const [placedescription, setPlacedescription] = useState("");
   const [placeid, setPlaceid] = useState("");
   const [venues, setVenueState] = useState([]);  
+  const [userId, setUserId] = useState()
 
-  useEffect(()=>{
+
+  saveBookmarks = (bookmarkItems) => {
+    let allDetail=[];
+    var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+    // var bookmarkPush = bookmark.push();
+    bookmark.set(bookmarkItems)
+    .then(()=>{
+      console.log('success',bookmarkItems.name)
+      alert('Bookmarked')
+      navigation.navigate('GeneralCategoryScreen')
+    }).catch(()=>{
+      console.log('error')
+    })
+        // setDetailActivity(allDetail)
+    } 
+
+    removeBookmark = (bookmarkItems) =>{
+      var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+      bookmark.remove().then(()=>{
+        console.log('removed')
+        alert('UnBookmarked')
+      navigation.goBack(null)
+      }).catch(()=>{
+        console.log('error removing')
+      })
+    }
+
+    const save = item => {
+      if(bookmark != true){
+          saveBookmarks(item)
+          console.log('select',item.name)
+      }
+      else{
+        removeBookmark(item);
+        console.log('unselect',item.name)
+      }
+    }
+
+    useFocusEffect(
+      React.useCallback(() => {
+        setBookmark(response)
+        getUserId(user)
        let list=[];
        list=Object.values(features)
        setFeature(list) 
-       console.log("features list:",feature)
+       console.log("features list:",feature,bookmark)
        const roundValue=Math.round(rating)
        let i;
        let ratingList=[];
@@ -87,8 +133,14 @@ export default function ActivityInformationScreen({ navigation, route}) {
        }
        setStar(ratingList)
        console.log("star:",star)
-    },[])
-
+      }, [])
+    );
+   
+  const user = value => {
+    if (value !== null && value !== '') {
+          setUserId(value)
+    }
+  }
   
 /*   const NearbyPlaces = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.7136,46.6753&radius=50000&type=campground&key=AIzaSyDgH0ZpaFEJ2HpSRxevHaeTupKpfZlVsBs";
  
@@ -199,8 +251,13 @@ export default function ActivityInformationScreen({ navigation, route}) {
            <Image source={shareicon} style={styles.share} />
           </TouchableWithoutFeedback>
         
-          <TouchableWithoutFeedback> 
-          <Image source={emptyheart2} style={styles.heart} />
+          <TouchableWithoutFeedback 
+          onPress={()=>
+          {
+            setBookmark(!bookmark)
+            save(object)
+          }}> 
+          <Image source={emptyheart2} style={[styles.heart,{tintColor: bookmark || response == true? 'red' : null}]} />
           </TouchableWithoutFeedback>
              
              

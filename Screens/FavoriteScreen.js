@@ -11,6 +11,8 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
+  // Alert
 } from "react-native";
 import Header from "../Components/Header";
 import { useFocusEffect } from '@react-navigation/native';
@@ -56,35 +58,32 @@ export default function FavoriteScreen({ navigation }) {
      console.log('call')
     let allBookmarks=[];
     let fetch = firebase.database().ref('user/'+userId).child('/bookmarks/');
-    fetch.on('value', (snapshot)=> {
+   fetch.on('value', (snapshot)=> {
             snapshot.forEach((childSnapshot)=> {
             let item = childSnapshot.val();
             let key = Object.keys(item)
             // console.log('itemsss',key)
             allBookmarks.push(item);
+            setLoading(false);
         });
         setBookmarkItems(allBookmarks)
-        console.log(bookmarkItems.length)
       })
-    
+  
     } 
     removeBookmark = (bookmarkItems) =>{
       var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
       bookmark.remove().then(()=>{
         console.log('removed')
+        alert('UnBookmarked')
         fetchBookmarks()
       }).catch(()=>{
         console.log('error removing')
       })
     }
-  
-  //  useEffect(()=>{
-  //      getUserId(user)
-  //   },[])
     useFocusEffect(
       React.useCallback(() => {
         getUserId(user)
-
+        setLoading(true);
       }, [])
     );
 
@@ -92,10 +91,10 @@ export default function FavoriteScreen({ navigation }) {
       if (value !== null && value !== '') {
             console.log('valuefavyuyuy',value)
             setUserId(value)
-              fetchBookmarks()
+            fetchBookmarks()
       }
     }
-  
+    const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState()
   const [bookmark, setBookmark] = useState(true)
   const [bookmarkItems, setBookmarkItems] = useState([])
@@ -115,34 +114,13 @@ export default function FavoriteScreen({ navigation }) {
           <View style={styles.titleContainer}>
             <Text style={styles.Recomend}>Favorites</Text>
           </View>
+          {loading ? (
+          <ActivityIndicator
+            //visibility of Overlay Loading Spinner
+            visible={loading}
+          />
+        ) : (
           <ScrollView>
-          {/* <FlatList
-          data={bookmarkItems}
-          renderItem={({item,index}) =>{
-            const {image,name}=item
-            console.log("componentDidMount on detail catagory",name) 
-          return (
-            // <View style={styles.cardFirstRow}>
-              <HomeCard
-                image={item.image}
-                title={item.name}
-                heart={Heart2}
-                item={item}
-                index={index}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen",{
-                    object: item,
-                  }) 
-               }
-              />
-            // </View>
-           )
-          }
-          }
-          extraData={bookmarkItems}
-          numColumns={2}
-          keyExtractor={(item, index) => index}
-        /> */}
           <FlatList
           data={bookmarkItems}
           renderItem={({item,index}) =>{
@@ -150,9 +128,10 @@ export default function FavoriteScreen({ navigation }) {
             <TouchableOpacity onPress={() =>
               navigation.navigate("ActivityInformationScreen",{
                 object: item,
+                response: true
               })}>
             <View style={styles.container1}>
-              <Image source={item.image} style={styles.cardImage} resizeMode={"contain"}/>
+              <Image source={{uri:item.image}} style={styles.cardImage} resizeMode={"cover"}/>
       
               <View>
                 <View style={styles.ratingsContainer}>
@@ -171,9 +150,10 @@ export default function FavoriteScreen({ navigation }) {
       
                   <TouchableOpacity 
                           onPress={() => {
+                            setBookmark(false)
                             removeBookmark(item)
                           }}>
-                    <Image source={emptyheart} style={{height:20,width:20,resizeMode:'contain',tintColor:'red'}} />
+                    <Image source={Heart2} style={{height:20,width:20,resizeMode:'contain',tintColor:bookmark === false ? null : 'red'}} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -187,7 +167,8 @@ export default function FavoriteScreen({ navigation }) {
           // keyExtractor={(item, index) => index}
         />   
         </ScrollView>  
-        </SafeAreaView>
+         )}
+          </SafeAreaView>
         );
 }
 

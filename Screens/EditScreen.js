@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -27,9 +27,10 @@ import DobPicker from "../Components/DobPicker";
 import male from "../assets/icons/male2.png"; //GenderImages
 import female from "../assets/icons/female2.png";//GenderImages
 
-
+import {getUserId} from '../apis/LocalDB'
 import { ScrollView } from "react-native-gesture-handler";
 import {removeIdFromLocalDb} from '../apis/LocalDB'
+import { useFocusEffect } from '@react-navigation/native';
 
 
 import * as firebase from 'firebase/app';
@@ -39,6 +40,12 @@ import 'firebase/database';
 
 
 export default function EditScreen({ navigation }) {
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserId(userProfile)
+    }, [])
+  );
 //user attributes
 const [mail, setMail] = useState("");
 const [nickname, setNickname] = useState("");
@@ -46,6 +53,7 @@ const [pass, setPass] = useState("");
 const [city, setCity] = useState("");
 const [DOB, setDOB] = useState("");
 const [gend, setGend] = useState("");
+const [userId, setUserId] = useState()
 const [values, setvalues] = useState([]);
 
   const [loaded] = useFonts({
@@ -57,6 +65,7 @@ const [values, setvalues] = useState([]);
     return <AppLoading />;
   }
 
+  
 
   SignOut = async() => {
     try{
@@ -67,7 +76,28 @@ const [values, setvalues] = useState([]);
   alert('Unable to Sign Out right now!');
   }}
 
+  fetchUserInfo = () =>{
+    let fetch = firebase.database().ref('user/'+userId);
+    fetch.on('value', (snapshot)=> {
+           
+             let item = snapshot.val();
+             let key = Object.keys(item)
+             console.log('itemsss',item)
+              setNickname(item.nickname)
+              setMail(item.email)
+              setCity(item.city)
+              setDOB(item.DateOfBirth)
+              setGend(item.gender)
+              console.log('q23q3',nickname,mail,city,DOB,gend)
+         });
+  }
 
+  const userProfile = value => {
+    if (value !== null && value !== '') {
+          setUserId(value)
+          fetchUserInfo()
+    }
+  }
 
   // var user = firebase.auth().currentUser;
 
@@ -84,11 +114,11 @@ const [values, setvalues] = useState([]);
 
 
 
-    var DateOfBirth = values[0];
-    var City= values[1];
-    var Email =values[2];
-    var Gender =values[3]; 
-    var Nickname = values[4];
+    // var DateOfBirth = values[0];
+    // var City= values[1];
+    // var Email =values[2];
+    // var Gender =values[3]; 
+    // var Nickname = values[4];
     
   
 
@@ -222,7 +252,7 @@ else{
                 keyboardType="default"
                 style={styles.inputMail}
                 /////////////////
-                defaultValue={Nickname}
+                defaultValue={nickname}
                 ///////////
                 placeholderTextColor="#707070"
                 onChangeText={(text) => setNickname(text)}
@@ -244,7 +274,7 @@ else{
 
 
                 ///////////
-                defaultValue={Email}
+                defaultValue={mail}
                 //////////
 
                 
@@ -286,10 +316,10 @@ else{
                 <Image source={require("../assets/icons/city.jpg")} />
 
                         <Picker 
-                iosHeader={City}
+                iosHeader={city}
                 mode = "dropdown" 
                 ////
-                selectedValue = {City} 
+                selectedValue = {city} 
                 ////
                 onValueChange = {city =>setCity(city)}
                 iosIcon = {<Icon name="arrow-down" />}
@@ -310,7 +340,7 @@ else{
       <View>
         <DatePicker
           
-          date={DateOfBirth} // Initial date from state
+          date={DOB} // Initial date from state
           mode="date" // The enum of date, datetime and time
           format="DD-MM-YYYY"
           minDate="01-01-1950"
@@ -338,7 +368,7 @@ else{
 
             <View style={styles.genderContainer}>
            
-            <RadioButton.Group selectedValue={Gender} onValueChange={gend => setGend(gend)} value={gend}>
+            <RadioButton.Group selectedValue={gend} onValueChange={gend => setGend(gend)} value={gend}>
 
 <RadioButton.Item 
 style = {styles.maleContainer} color="#7D34E3" label="Female" value="Female" />

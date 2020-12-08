@@ -17,7 +17,8 @@ import { onChange } from "react-native-reanimated";
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import '@react-native-firebase/database';
-// import { TouchableOpacity } from "react-native-gesture-handler";
+import Heart from "../assets/icons/Heart.png";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function HomeCard({
@@ -32,61 +33,59 @@ export default function HomeCard({
   heart,
   onPress2,
 }) {
-  saveBookmarks = (bookmarkItems) => {
-    let allDetail=[];
-    var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
-    // var bookmarkPush = bookmark.push();
-    bookmark.set(bookmarkItems)
-    .then(()=>{
-      console.log('success')
-    }).catch(()=>{
-      console.log('error')
-    })
-    console.log('21312312412',bookmarkItems)
-        // setDetailActivity(allDetail)
-    } 
+  
 
-    removeBookmark = (bookmarkItems) =>{
-      var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
-      bookmark.remove().then(()=>{
-        console.log('removed')
-      }).catch(()=>{
-        console.log('error removing')
-      })
-    }
+  // saveBookmarks = (bookmarkItems) => {
+  //   let allDetail=[];
+  //   var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+  //   // var bookmarkPush = bookmark.push();
+  //   bookmark.set(bookmarkItems)
+  //   .then(()=>{
+  //     console.log('success',heart)
 
-    useEffect(()=>{
-      getUserId(user);
-      console.log('item')
-   },[])
+  //   }).catch(()=>{
+  //     console.log('error')
+  //   })
+  //       // setDetailActivity(allDetail)
+  //   } 
+
+  //   removeBookmark = (bookmarkItems) =>{
+  //     var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);
+  //     bookmark.remove().then(()=>{
+  //       console.log('removed')
+  //     }).catch(()=>{
+  //       console.log('error removing')
+  //     })
+  //   }
+
+    useFocusEffect(
+      React.useCallback(() => {
+        getUserId(user)
+      }, [])
+    );
    
   const user = value => {
     if (value !== null && value !== '') {
-          console.log('value',value)
           setUserId(value)
     }
   }
+  var red;
   const [userId, setUserId] = useState()
-  const [bookmark, setBookmark] = useState(false)
+  const [bookmark, setBookmark] = useState(heart)
   const [bookmarkItems, setBookmarkItems] = useState([])
-  let bookmarkItemArray = []
-
-const save = item => {
-  if(bookmark != true){
-    // console.log('sads',item.name)
-      // bookmarkItemArray.push(item.name)
-      // setBookmarkItems(...bookmarkItems,item.name)
-      saveBookmarks(item)
-      // console.log('select',bookmarkItems)
-      console.log('select',bookmarkItems)
+  const [bookmarkedItems, setBookmarkedItems] = useState([])
 
 
-  }
-  else{
-    removeBookmark(item);
-    console.log('unselect',bookmarkItems)
-  }
-}
+// const save = item => {
+//   if(bookmark != true){
+//       saveBookmarks(item)
+//       console.log('select',item.name)
+//   }
+//   else{
+//     removeBookmark(item);
+//     console.log('unselect',item.name)
+//   }
+// }
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -100,7 +99,7 @@ const save = item => {
     <TouchableOpacity onPress={onPress2}>
       <View style={styles.container}>
 
-        <Image source={{uri:image}} style={styles.cardImage} resizeMode={"contain"}/>
+        <Image source={{uri:image}} style={styles.cardImage} resizeMode={"cover"}/>
 
 
         <View>
@@ -118,15 +117,13 @@ const save = item => {
               <Image source={require("../assets/icons/down-arrow.png")} />
             </View>
 
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
                     onPress={() => {
-                        setBookmark(!bookmark);
-                        console.log(bookmark)
-      save(item)
-                   
-                    }}>
-              <Image source={heart} style={{height:20,width:20,resizeMode:'contain',tintColor: bookmark === true ? 'red' : null}} />
-            </TouchableOpacity>
+                        setBookmark(!heart);
+                        save(item)
+                    }}> */}
+              <Image source={Heart} style={{height:20,width:20,resizeMode:'contain',tintColor:heart}} />
+            {/* </TouchableOpacity> */}
           </View>
         </View>
       </View>

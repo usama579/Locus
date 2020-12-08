@@ -9,7 +9,7 @@ import {
   SafeAreaView,
   Text,
   Modal,
-  Alert,
+  ActivityIndicator,
   FlatList,
   TouchableWithoutFeedback,
   TouchableOpacity,
@@ -31,6 +31,7 @@ import { ScrollView } from "react-native-gesture-handler";
 
 import CityPicker from "../Components/CityPicker";
 import CategoryBox from "../Components/CategoryBox";
+import { useFocusEffect } from '@react-navigation/native';
 
 //images
 import backImage from "../assets/cafeCat.png";
@@ -56,6 +57,7 @@ import 'firebase/auth';
 import '@react-native-firebase/database';
 
 export default function GeneralCategoryScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [activity, setActivity] = useState([]);
@@ -70,14 +72,19 @@ export default function GeneralCategoryScreen({ navigation }) {
      console.log("componentDidMount on catagory")
       let todosKeys=Object.keys(snapshot.val());
       setActivity(todosKeys)
+      setLoading(false);
     });
-        // setActivity(response) 
     }
-
-    useEffect(()=>{
-         fetchActivity()
-      },[])
-
+    // useFocusEffect(
+    //   React.useCallback(() => {
+    //     fetchActivity()
+    //     setLoading(true)
+    //   }, [])
+    // );
+useEffect(()=>{
+  fetchActivity()
+      setLoading(true)
+},[])
   if (!loaded) {
     return <AppLoading />;
   }
@@ -85,7 +92,7 @@ export default function GeneralCategoryScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
-
+    
       <View style={styles.searchContainer}>
         <View style={styles.searchSubContainer}>
           <Image source={require("../assets/icons/searchIcon.png")} />
@@ -122,6 +129,14 @@ export default function GeneralCategoryScreen({ navigation }) {
         </View>
        
       </View>
+      {loading ? (
+          <ActivityIndicator
+            //visibility of Overlay Loading Spinner
+            visible={loading}
+            textContent={'Loading...'}
+            textStyle={{fontSize:20,color:'blue'}}
+          />
+        ) : (
       <FlatList
           data={activity}
           renderItem={({ item }) => (
@@ -143,11 +158,13 @@ export default function GeneralCategoryScreen({ navigation }) {
           numColumns={2}
           keyExtractor={(item, index) => index}
         />
+        )}
 
 
       {/*Filter Modal */}
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
+
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={styles.modalTopContainer}>
@@ -203,7 +220,7 @@ export default function GeneralCategoryScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+        </SafeAreaView>
   );
 }
 

@@ -147,6 +147,10 @@ function FavCat() {
           name="ActivityInformationScreen"
           component={ActivityInformationScreen}
         />
+         <Stack4.Screen
+          name="GeneralCategoryScreen"
+          component={GeneralCategoryScreen}
+        />
         
       </Stack4.Navigator>
     </NavigationContainer>

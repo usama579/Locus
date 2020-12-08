@@ -14,7 +14,6 @@ import HomeCard from "../Components/HomeCard";
 //card images
 
 
-import bella from "../assets/bella.png";
 import kabab from "../assets/kababjees.png";
 import tandoor from "../assets/tandoor.png";
 import cafe from "../assets/cafe.png";
@@ -41,15 +40,13 @@ export default function HomeScreen({ navigation }) {
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
 
-
+  const bella = "https://pbs.twimg.com/media/C56DkeFWYAIarxw.jpg";
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [tryyy, settryy] = useState("");
   const [place, setPlace] = useState("");
   const [category, setCategory] = useState("");
   const [values, setvalues] = useState("");
-
-
 /* useEffect(() => {  */      
  /*  firebase.database().ref('TemproryEvent').child('1').once('value').then((snapshot) => {
 
@@ -131,13 +128,13 @@ fetchData();
                // subTitle1="Khayaban shahbaz (Karachi)"
             //    subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
 
               <HomeCard
-                image={kabab}
+                image={bella}
                 title="Kababjees"
                 star1={star}
                 star2={star}
@@ -147,9 +144,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
               <HomeCard
                 image={bella}
@@ -162,9 +159,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
             </View>
           </ScrollView>
@@ -181,7 +178,7 @@ fetchData();
           >
             <View style={styles.cardFirstRow}>
               <HomeCard
-                image={tandoor}
+                image={bella}
                 title="Tandoor"
                 star1={star}
                 star2={star}
@@ -191,13 +188,13 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
 
               <HomeCard
-                image={cafe}
+                image={bella}
                 title="Cafe Bogie"
                 star1={star}
                 star2={star}
@@ -207,9 +204,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
               <HomeCard
                 image={bella}
@@ -222,9 +219,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
             </View>
           </ScrollView>
@@ -242,7 +239,7 @@ fetchData();
           >
             <View style={styles.cardFirstRow}>
               <HomeCard
-                image={spice}
+                image={bella}
                 title="Spice"
                 star1={star}
                 star2={star}
@@ -252,13 +249,13 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
 
               <HomeCard
-                image={hardees}
+                image={bella}
                 title="Hardees"
                 star1={star}
                 star2={star}
@@ -268,9 +265,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
               <HomeCard
                 image={bella}
@@ -283,9 +280,9 @@ fetchData();
                 subTitle1="Khayaban shahbaz (Karachi)"
                 subTitle2="Burgers Beverage Italian American Fast Food"
                 heart={emptyheart}
-                onPress2={() =>
-                  navigation.navigate("ActivityInformationScreen")
-                }
+                // onPress2={() =>
+                //   navigation.navigate("ActivityInformationScreen")
+                // }
               />
             </View>
           </ScrollView>

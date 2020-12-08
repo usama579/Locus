@@ -2,12 +2,16 @@ import React, {useState,useEffect} from 'react';
 import {
   ActivityIndicator,
   StatusBar,
-  View,
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
 } from 'react-native';
 import {getUserId} from '../apis/LocalDB';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Splash ({navigation}) {
     const [isUser, setUser] = useState()
@@ -31,7 +35,10 @@ export default function Splash ({navigation}) {
     }
   }
     return (
-      <SafeAreaView style={[styles.container, {backgroundColor: 'grey'}]} />
+      <SafeAreaView style={[styles.container, {backgroundColor:'#F7F7F7'} ]}
+       >
+         <Image source = {require('../assets/LocusBG.jpeg')} style={{width:wp('100%')}} resizeMode={'contain'}/>
+         </SafeAreaView>
     );
 }
 
