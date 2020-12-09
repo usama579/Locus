@@ -12,7 +12,7 @@ import {
   Modal,
   Alert,
   TouchableHighlight,
-  Button,
+  Share,
   FlatList
 } from "react-native";
 import Header from "../Components/Header";
@@ -24,30 +24,17 @@ import {
 
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
-import ActivityCard from "../Components/ActivityCard";
-import { Rating } from 'react-native-ratings';
-import Boy from "../assets/boy.png";
-import Girl from "../assets/girl.png";
-
-//card images
-import bella from "../assets/bella.png";
-
 //star
-import star from "../assets/icons/star.png";
-import halfstar from "../assets/icons/halfstar.png"
 import starrr from "../assets/icons/starrr.png";
 
 
 //Hearts
 import emptyheart2 from "../assets/icons/Heart2.png";
 import { ScrollView } from "react-native-gesture-handler";
-import RatingsCard from "../Components/RatingsCard";
-import { useSafeArea } from "react-native-safe-area-context";
 import * as firebase from 'firebase/app';
 import shareicon from "../assets/icons/share.png";
 import { useFocusEffect } from '@react-navigation/native';
-import {getUserId} from '../apis/LocalDB'
-
+import {getUserId} from '../apis/LocalDB';
 import 'firebase/auth';
 import 'firebase/database';
 import { saveUserId } from "../apis/LocalDB";
@@ -70,13 +57,7 @@ export default function ActivityInformationScreen({ navigation, route}) {
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
   const [feature,setFeature]=useState([]);
-  const [star,setStar]=useState([]);
-  const [placename, setPlacename] = useState("");
-  const [placelocation, setPlacelocation] = useState("");
-  const [pictureurl, setPicureurl] = useState("");
-  const [placedescription, setPlacedescription] = useState("");
-  const [placeid, setPlaceid] = useState("");
-  const [venues, setVenueState] = useState([]);  
+  const [star,setStar]=useState([]); 
   const [userId, setUserId] = useState()
 
 
@@ -145,6 +126,28 @@ export default function ActivityInformationScreen({ navigation, route}) {
           setUserId(value)
     }
   }
+
+  openShareDialogAsync = async () => {
+   try {
+    const result = await Share.share({
+      message: image,
+    });
+    if (result.action === Share.sharedAction) {
+      if (result.activityType) {
+        alert("alert")
+        // shared with activity type of result.activityType
+      } else {
+        // shared
+        alert("alert 1")
+      }
+    } else if (result.action === Share.dismissedAction) {
+      // dismissed
+      alert("alert 2")
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+  }; 
   
 /*   const NearbyPlaces = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.7136,46.6753&radius=50000&type=campground&key=AIzaSyDgH0ZpaFEJ2HpSRxevHaeTupKpfZlVsBs";
  
@@ -244,14 +247,14 @@ export default function ActivityInformationScreen({ navigation, route}) {
       <Header />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ marginVertical: hp("-5%"), zIndex: -1 }}
+        style={{paddingBottom: hp("5%"), marginTop: hp("-5%"), zIndex: -1 }}
       >
         <View style={styles.titleContainer}>
           <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
             <Image source={require("../assets/icons/backArrow.png")} />
           </TouchableWithoutFeedback>
           
-          <TouchableWithoutFeedback> 
+          <TouchableWithoutFeedback onPress={openShareDialogAsync}> 
            <Image source={shareicon} style={styles.share} />
           </TouchableWithoutFeedback>
         
