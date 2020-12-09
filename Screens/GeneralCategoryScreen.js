@@ -36,18 +36,6 @@ import { useFocusEffect } from '@react-navigation/native';
 //images
 import backImage from "../assets/cafeCat.png";
 import centerImage from "../assets/icons/cup.png";
-
-import artImage from "../assets/artImage.png";
-import art from "../assets/icons/art.png";
-
-import RestoImage from "../assets/restoImage.png";
-import resto from "../assets/icons/resturent.png";
-
-import ShopImage from "../assets/shopImage.png";
-import shop from "../assets/icons/shopping.png";
-
-import SportsImage from "../assets/sportsImage.png";
-import sports from "../assets/icons/sports.png";
 // import {getAllActvities} from "../apis/ActivityFunctions"
 import ModalButtons from "../Components/ModalButtons";
 import ModalButtons2 from "../Components/ModalButton2";
@@ -59,8 +47,9 @@ import '@react-native-firebase/database';
 export default function GeneralCategoryScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [pass, setPass] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
+  const [filter, setFilter] = useState(false);
   const [activity, setActivity] = useState([]);
+  const [customActivity,setCustomActivity] = useState([]);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -89,6 +78,17 @@ useEffect(()=>{
     return <AppLoading />;
   }
 
+  onChangeText = (text) => {
+    setPass(text)
+    setFilter(true)
+    let array=[...activity]
+      array = array.filter(function (item) {
+      return item.includes(text)
+      })
+      console.log("array filter by credit cards :",array)
+      setCustomActivity(array)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Header />
@@ -102,21 +102,9 @@ useEffect(()=>{
             style={styles.inputpass}
             placeholder="What are you looking for"
             placeholderTextColor="#707070"
-            onChangeText={(text) => setPass(text)}
+            onChangeText={onChangeText}
             defaultValue={pass}
           />
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setModalVisible(true);
-            }}
-          >
-            <Image
-              style={{
-                alignSelf: "center",
-              }}
-              source={require("../assets/icons/modal.png")}
-            />
-          </TouchableWithoutFeedback>
         </View>
       </View>
 
@@ -137,8 +125,14 @@ useEffect(()=>{
             textStyle={{fontSize:20,color:'blue'}}
           />
         ) : (
-      <FlatList
-          data={activity}
+          <>
+        {(activity.length <= 0 || ((customActivity <= 0) && filter)) ?
+          <View style={{alignSelf:'center'}}>
+          <Text style={{fontSize:20}}>No data found</Text>
+          </View>
+          :  
+        <FlatList
+          data={filter ? customActivity:activity}
           renderItem={({ item }) => (
           <View style={styles.catRow2}>
           <CategoryBox
@@ -154,73 +148,15 @@ useEffect(()=>{
           </View>
           )
           }
-          extraData={activity}
+          extraData={filter ? customActivity:activity}
           numColumns={2}
           keyExtractor={(item, index) => index}
         />
+        }
+        </>
         )}
 
-
-      {/*Filter Modal */}
-
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.modalTopContainer}>
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <Image source={require("../assets/icons/cross.png")} />
-              </TouchableWithoutFeedback>
-              <Text style={styles.filters}>Filters</Text>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
-              >
-                <Image source={require("../assets/icons/check.png")} />
-              </TouchableWithoutFeedback>
-            </View>
-
-            <View style={styles.separator} />
-
-            <Text style={styles.sortBy}>Sort by</Text>
-
-            <View style={styles.passwordContainer}>
-            <View style={styles.passwordSubContainer}>
-             
-
-              <CityPicker2  color="#fff"/>
-            </View>
-          </View>
-
-            <Text style={styles.price}>Price</Text>
-            <PriceSegment />
-            <View style={{marginTop:hp('1%')}}>
-              
-            <Text style={styles.feature}>Features</Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <ModalButtons title="Accept Credit Cards" />
-              <ModalButtons2 title="Parking" />
-              <ModalButtons2 title="Wi-Fi" />
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <ModalButtons title="Outdoors seatings" />
-              <ModalButtons2 title="Live music" />
-              <ModalButtons2 title="Delivery" />
-            </View>
-            </View>
-
-          </View>
-        </View>
-      </Modal>
-        </SafeAreaView>
+  </SafeAreaView>
   );
 }
 
