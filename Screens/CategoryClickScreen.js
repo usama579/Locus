@@ -22,46 +22,37 @@ import {
 
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
-
-//card images
-import bella from "../assets/bella.png";
-import kabab from "../assets/kababjees.png";
-import tandoor from "../assets/tandoor.png";
-import cafe from "../assets/cafe.png";
-import spice from "../assets/spice.png";
-import hardees from "../assets/hardees.png";
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-//star
-import star from "../assets/icons/star.png";
-import halfstar from "../assets/icons/halfstar.png";
-import emptystar from "../assets/icons/emptystar.png";
-
-//Hearts
-import emptyheart from "../assets/icons/Heart.png";
-import Heart from "../assets/icons/redHeart.png";
 import { ScrollView } from "react-native-gesture-handler";
 import HomeCard from "../Components/HomeCard";
-import ModalButtons from "../Components/ModalButtons";
-import ModalButtons2 from "../Components/ModalButton2";
-import PriceSegment from "../Components/PriceSegment";
 import {getUserId} from '../apis/LocalDB'
+import SegmentedControlTab from "react-native-segmented-control-tab";
+
 export default function CategoryClickScreen({ navigation, route, onPress2 }) {
   const { title } = route.params;
   const [pass, setPass] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [detailActivity, setDetailActivity] = useState([]);
   const [customDetailActivity, setCustomDetailActivity] = useState([]);
+  const [searchDetailActivity,setSearchDetailActivity] = useState([])
   const [userId, setUserId] = useState()
-  const [unbookmarked, setUnBookmarked] = useState(false)
-  const [selected,setSelected] = useState("Asc")
+  const [selected,setSelected] = useState("None")
   const [bookmarkedItems, setBookmarkedItems] = useState([])
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [filter,setFilter]=useState(false)
+  const [creditCard,setCreditCard] = useState(false)
+  const [parking,setParking] = useState(false)
+  const [wiFi,setWiFi] = useState(false)
+  const [outDoorSeat,setOutDoorSeat] = useState(false)
+  const [takeOut,setTakeOut] = useState(false)
+  const [delivery,setDelivery] = useState(false)
+  
   fetchDetailActivity = async ()=>{
     let allDetail=[];
     firebase.database().ref('Activities/'+title+'/Venues').on('value', (snapshot)=> {
@@ -106,29 +97,110 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
     return <AppLoading />;
   }
 
+  function distance(lat1, lon1, lat2, lon2) {
+    if ((lat1 == lat2) && (lon1 == lon2)) {
+      return 0;
+    }
+    else {
+      var radlat1 = Math.PI * lat1/180;
+      var radlat2 = Math.PI * lat2/180;
+      var theta = lon1-lon2;
+      var radtheta = Math.PI * theta/180;
+      var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+      if (dist > 1) {
+        dist = 1;
+      }
+      dist = Math.acos(dist);
+      dist = dist * 180/Math.PI;
+      dist = dist * 60 * 1.1515;
+      dist = dist * 1.609344 
+      return dist;
+    }
+  }
+
   onValueChange=(value)=> {
-    console.log('value:',value)
-    let array=detailActivity
-      if(value == 'Asc'){
-        setSelected(value)
-        array.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)); 
-        console.log("sorted array 1:",array)
-        //setCustomDetailActivity(array);
+    setSelected(value)
+  }
+
+  checkPressed = () => {
+    setFilter(true)
+    let lat=24.753006
+    let lng=46.674387
+    let array=[...detailActivity]
+      if(selected == 'Asc'){
+        array.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
       }
-      else if(value == 'Dsc'){
-        setSelected(value)
-        array.sort((a,b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0)); 
-        console.log("sorted array 2:",array)
-        //setCustomDetailActivity(array);
+      else if(selected == 'Dsc'){
+        array.sort((a,b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0));
       }
-      else if(value == 'Nearest'){
-        setSelected(value)
-        //setCustomDetailActivity();
+      else if(selected == 'Nearest'){
+        array.sort((a,b) => {
+        let d1=distance(lat,lng,a.geometry.location.lat,a.geometry.location.lng);
+        let d2=distance(lat,lng,b.geometry.location.lat,b.geometry.location.lng);
+        if(d1 < d2) 
+        return  -1;
+        else if(d2 <d1)
+        return 1;
+        else 
+        return 0;
+        })
+      }
+      else if(selected == 'Furthest'){
+        array.sort((a,b) => {
+        let d1=distance(lat,lng,a.geometry.location.lat,a.geometry.location.lng);
+        let d2=distance(lat,lng,b.geometry.location.lat,b.geometry.location.lng);
+        if(d1 < d2) 
+        return  1;
+        else if(d2 <d1)
+        return -1;
+        else 
+        return 0;
+        })
       }
       else if(value == 'Furthest'){
         setSelected(value)
         //setCustomDetailActivity();
       } 
+      if(selectedIndex !== 0){
+        array = array.filter(function (item) {
+          return item.price_level && item.price_level <= selectedIndex
+        })
+      }
+      
+      if(creditCard || parking || wiFi || outDoorSeat || takeOut || delivery){
+        array = array.filter(function (item) {
+        let list=[];
+        list=Object.values(item.features)
+        return (
+        (creditCard ? list.includes("Credit Cards"):true) &&
+        (parking ? list.includes("Parking"):true) &&
+        (wiFi ? list.includes("Wi-Fi"):true) &&
+        (outDoorSeat ? list.includes("Outdoor Seating"):true) &&
+        (takeOut ? list.includes("Take-out"):true) &&
+        (delivery ? list.includes("Delivery"):true)  
+        )    
+        })
+      }
+
+      console.log("array filter by credit cards :",array)
+      setCustomDetailActivity(array)
+
+    setModalVisible(!modalVisible);
+  }
+
+  const handleSingleIndexSelect = (index) => {
+    setSelectedIndex(index);
+  };
+
+  onChangeText= (text) => {
+    setPass(text)
+    let array=[]
+    {filter ? array=[...customDetailActivity] : array=[...detailActivity]}
+      array = array.filter(function (item) {
+      return item.name.includes(text)
+      })
+      console.log("array filter by credit cards :",array)
+      setSearchDetailActivity(array)
   }
 
   return (
@@ -144,7 +216,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
             style={styles.inputpass}
             placeholder="Search"
             placeholderTextColor="#707070"
-            onChangeText={(text) => setPass(text)}
+            onChangeText={onChangeText}
             defaultValue={pass}
           />
 
@@ -174,9 +246,13 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
 
             <Text style={styles.Recomend}>{title}</Text>
           </View>
-          
+          {((pass !== "" && searchDetailActivity.length <= 0) || detailActivity.length <= 0 || ((customDetailActivity <= 0) && filter)) ?
+          <View style={{alignSelf:'center'}}>
+          <Text style={{fontSize:20}}>No data found</Text>
+          </View>
+          :
           <FlatList
-          data={detailActivity}
+          data={pass !== "" ? searchDetailActivity : (filter ? customDetailActivity:detailActivity)}
           renderItem={({item,index}) =>{
             // item search in (bookmarkitem)
             const response= bookmarkedItems.some((selectedItem)=> selectedItem.name === item.name);
@@ -201,10 +277,11 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
            )
           }
           }
-          extraData={detailActivity}
+          extraData={pass !== "" ? searchDetailActivity : (filter ? customDetailActivity:detailActivity)}
           numColumns={2}
           keyExtractor={(item, index) => index}
-        />
+          />
+          }
         </View>
       </ScrollView>
       {/*Filter Modal */}
@@ -223,9 +300,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
               <Text style={styles.filters}>Filters</Text>
 
               <TouchableWithoutFeedback
-                onPress={() => {
-                  setModalVisible(!modalVisible);
-                }}
+                onPress={checkPressed}
               >
                 <Image source={require("../assets/icons/check.png")} />
               </TouchableWithoutFeedback>
@@ -244,6 +319,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
               selectedValue={selected}
               onValueChange={onValueChange}
             >
+              <Picker.Item label="None" value="None" />
               <Picker.Item label="Asc" value="Asc" />
               <Picker.Item label="Dsc" value="Dsc" />
               <Picker.Item label="Nearest" value="Nearest" />
@@ -254,22 +330,63 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
           </View>
 
             <Text style={styles.price}>Price</Text>
-            <PriceSegment />
-             
+            <View style={styles.priceContainer}>
+        <SegmentedControlTab
+          values={["None","$", "$$", "$$$", "$$$$"]}
+          selectedIndex={selectedIndex}
+          tabStyle={styles.tabStyle}
+          activeTabStyle={styles.activeTabStyle}
+          activeTabTextStyle={{ color: "#7D34E3" }}
+          onTabPress={handleSingleIndexSelect}
+          tabTextStyle={{ color: "#fff" }}
+          firstTabStyle={{
+            borderTopLeftRadius: 20,
+            borderBottomLeftRadius: 20,
+          }}
+          lastTabStyle={{
+            borderTopRightRadius: 20,
+            borderBottomRightRadius: 20,
+          }}
+          tabsContainerStyle={{ height: hp("6%"), width: wp("90%") }}
+        />
+      </View>
+      
              <View style={{marginTop:hp('1%')}}>
 
             <Text style={styles.feature}>Features</Text>
 
             <View style={{ flexDirection: "row" }}>
-              <ModalButtons title="Accept Credit Cards" />
-              <ModalButtons2 title="Parking" />
-              <ModalButtons2 title="Wi-Fi" />
+            <TouchableOpacity onPress={()=>{setCreditCard(!creditCard)}}
+            style={[ styles.featureContainer,{ width: wp("50%"),height: hp("4%"),backgroundColor: creditCard ? "#fff":"#7D34E3" }]}>
+            <Text style={{ color:creditCard ? "#7D34E3":"#fff" }}>Accept Credit Cards</Text>
+            </TouchableOpacity>
+      
+            <TouchableOpacity onPress={()=>{setParking(!parking)}}
+            style={[ styles.featureContainer,{ backgroundColor: parking ? "#fff":"#7D34E3" }]}>
+            <Text style={{ color:parking ? "#7D34E3":"#fff" }}>Parking</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={()=>{setWiFi(!wiFi)}}
+            style={[ styles.featureContainer,{ backgroundColor: wiFi ? "#fff":"#7D34E3" }]}>
+            <Text style={{ color:wiFi ? "#7D34E3":"#fff" }}>Wi-Fi</Text>
+            </TouchableOpacity>
             </View>
 
             <View style={{ flexDirection: "row" }}>
-              <ModalButtons title="Outdoors seatings"/>
-              <ModalButtons2 title="Live music" />
-              <ModalButtons2 title="Delivery" />
+            <TouchableOpacity onPress={()=>{setOutDoorSeat(!outDoorSeat)}}
+             style={[ styles.featureContainer,{ width: wp("45%"), backgroundColor: outDoorSeat ? "#fff":"#7D34E3" }]}>
+             <Text style={{ color:outDoorSeat ? "#7D34E3":"#fff" }}>Outdoors seatings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={()=>{setTakeOut(!takeOut)}}
+             style={[ styles.featureContainer,{ backgroundColor: takeOut ? "#fff":"#7D34E3" }]}>
+             <Text style={{ color:takeOut ? "#7D34E3":"#fff" }}>Take-out</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={()=>{setDelivery(!delivery)}}
+             style={[ styles.featureContainer,{ backgroundColor: delivery ? "#fff":"#7D34E3" }]}>
+             <Text style={{ color:delivery ? "#7D34E3":"#fff" }}>Delivery</Text>
+            </TouchableOpacity>
             </View>
             </View>
           </View>
@@ -484,4 +601,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  priceContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: wp("4%"),
+    marginTop: hp("-1.5%"),
+  },
+  tabStyle: {
+    borderColor: "#fff",
+    backgroundColor: "#7D34E3",
+  },
+  activeTabStyle: {
+    backgroundColor: "#fff",
+  },
+  featureContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#fff",
+    width: wp("22%"),
+    height: hp("4%"),
+    borderRadius: 20,
+    marginRight: wp("2%"),
+    marginTop: hp("1%"),
+  }
 });

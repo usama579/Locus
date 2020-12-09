@@ -99,7 +99,7 @@ export default function FavoriteScreen({ navigation }) {
     }
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState()
-    const [getItems, setGetItems] = useState()
+    const [getItems, setGetItems] = useState(false)
   const [bookmark, setBookmark] = useState(true)
   const [bookmarkItems, setBookmarkItems] = useState([])
   const bookmarkItemArray = []
@@ -126,7 +126,7 @@ export default function FavoriteScreen({ navigation }) {
         ) : (
           <ScrollView>
             {(getItems && bookmarkItems.length <= 0) ? 
-            <View style={{display: bookmarkItems.length <= 0 ? 'flex' : 'none',alignSelf:'center'}}>
+            <View style={{alignSelf:'center'}}>
           <Text style = {{fontSize:20,fontWeight:'bold'}}>No Favourites found</Text>
         </View>
         :
