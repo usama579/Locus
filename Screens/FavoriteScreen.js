@@ -51,7 +51,7 @@ import PriceSegment from "../Components/PriceSegment";
 import {getUserId} from '../apis/LocalDB'
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import '@react-native-firebase/database';
+import 'firebase/database';
 
 export default function FavoriteScreen({ navigation }) {
    fetchBookmarks = async ()=>{
@@ -69,8 +69,8 @@ export default function FavoriteScreen({ navigation }) {
         setBookmarkItems(allBookmarks)
       })
       if (bookmarkItems.length <= 0){
-        setLoading(false)
-        alert('No Favourites added')
+          setGetItems(true)
+          setLoading(false)
       }
     } 
     removeBookmark = (bookmarkItems) =>{
@@ -99,6 +99,7 @@ export default function FavoriteScreen({ navigation }) {
     }
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState()
+    const [getItems, setGetItems] = useState()
   const [bookmark, setBookmark] = useState(true)
   const [bookmarkItems, setBookmarkItems] = useState([])
   const bookmarkItemArray = []
@@ -124,6 +125,11 @@ export default function FavoriteScreen({ navigation }) {
           />
         ) : (
           <ScrollView>
+            {(getItems && bookmarkItems.length <= 0) ? 
+            <View style={{display: bookmarkItems.length <= 0 ? 'flex' : 'none',alignSelf:'center'}}>
+          <Text style = {{fontSize:20,fontWeight:'bold'}}>No Favourites found</Text>
+        </View>
+        :
           <FlatList
           data={bookmarkItems}
           renderItem={({item,index}) =>{
@@ -131,7 +137,8 @@ export default function FavoriteScreen({ navigation }) {
             <TouchableOpacity onPress={() =>
               navigation.navigate("ActivityInformationScreen",{
                 object: item,
-                response: true
+                response: true,
+                fromFav: true
               })}>
             <View style={styles.container1}>
               <Image source={{uri:item.image}} style={styles.cardImage} resizeMode={"cover"}/>
@@ -168,7 +175,8 @@ export default function FavoriteScreen({ navigation }) {
           // extraData={detailActivity}
           numColumns={2}
           // keyExtractor={(item, index) => index}
-        />   
+        />  
+      }         
         </ScrollView>  
          )}
           </SafeAreaView>

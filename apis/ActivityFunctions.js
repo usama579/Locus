@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import '@react-native-firebase/database';
+import 'firebase/database';
 
 export async function getAllActvities(){
     // let allNotes={};

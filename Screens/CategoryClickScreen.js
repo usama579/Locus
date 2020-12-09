@@ -32,7 +32,7 @@ import spice from "../assets/spice.png";
 import hardees from "../assets/hardees.png";
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import '@react-native-firebase/database';
+import 'firebase/database';
 //star
 import star from "../assets/icons/star.png";
 import halfstar from "../assets/icons/halfstar.png";
@@ -128,8 +128,7 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
       else if(value == 'Furthest'){
         setSelected(value)
         //setCustomDetailActivity();
-      }
-      
+      } 
   }
 
   return (

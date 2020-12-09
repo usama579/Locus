@@ -16,7 +16,7 @@ import { AppLoading } from "expo";
 import { onChange } from "react-native-reanimated";
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import '@react-native-firebase/database';
+import 'firebase/database';
 import Heart from "../assets/icons/Heart.png";
 import { useFocusEffect } from '@react-navigation/native';
 

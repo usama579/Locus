@@ -54,7 +54,7 @@ import ModalButtons2 from "../Components/ModalButton2";
 import CityPicker2 from "../Components/CityPicker2";
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import '@react-native-firebase/database';
+import 'firebase/database';
 
 export default function GeneralCategoryScreen({ navigation }) {
   const [loading, setLoading] = useState(false);

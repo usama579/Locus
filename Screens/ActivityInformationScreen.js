@@ -61,7 +61,7 @@ import { saveUserId } from "../apis/LocalDB";
     } */
 
 export default function ActivityInformationScreen({ navigation, route}) {
-  const { object,response } = route.params;
+  const { object,response,fromFav } = route.params;
   const {image,name,rating,features}=object
   const [bookmark,setBookmark] = useState(response)
   const [modalVisible, setModalVisible] = useState(false);
@@ -100,7 +100,11 @@ export default function ActivityInformationScreen({ navigation, route}) {
       bookmark.remove().then(()=>{
         console.log('removed')
         alert('UnBookmarked')
-      navigation.goBack(null)
+        if (fromFav){
+      navigation.navigate('FavoriteScreen')
+    }else{
+      navigation.navigate('GeneralCategoryScreen')
+    }
       }).catch(()=>{
         console.log('error removing')
       })
