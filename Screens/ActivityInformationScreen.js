@@ -33,6 +33,7 @@ import emptyheart2 from "../assets/icons/Heart2.png";
 import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from 'firebase/app';
 import shareicon from "../assets/icons/share.png";
+import OpenMap from 'react-native-open-map';
 import { useFocusEffect } from '@react-navigation/native';
 import {getUserId} from '../apis/LocalDB';
 import 'firebase/auth';
@@ -49,7 +50,8 @@ import { saveUserId } from "../apis/LocalDB";
 
 export default function ActivityInformationScreen({ navigation, route}) {
   const { object,response,fromFav } = route.params;
-  const {image,name,rating,features}=object
+  const {image,name,rating,features,vicinity,geometry}=object
+  const {lat,lng} =geometry.location
   const [bookmark,setBookmark] = useState(response)
   const [modalVisible, setModalVisible] = useState(false);
   const [loaded] = useFonts({
@@ -134,20 +136,27 @@ export default function ActivityInformationScreen({ navigation, route}) {
     });
     if (result.action === Share.sharedAction) {
       if (result.activityType) {
-        alert("alert")
+        // alert("alert")
         // shared with activity type of result.activityType
       } else {
         // shared
-        alert("alert 1")
+        // alert("alert 1")
       }
     } else if (result.action === Share.dismissedAction) {
       // dismissed
-      alert("alert 2")
+      //alert("alert 2")
     }
   } catch (error) {
     alert(error.message);
   }
   }; 
+
+  const OpenMapApi = () => {
+    OpenMap.show({
+      latitude: lat,
+      longitude: lng,
+    });
+  }
   
 /*   const NearbyPlaces = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.7136,46.6753&radius=50000&type=campground&key=AIzaSyDgH0ZpaFEJ2HpSRxevHaeTupKpfZlVsBs";
  
@@ -305,9 +314,9 @@ export default function ActivityInformationScreen({ navigation, route}) {
               source={require("../assets/icons/locicon.png")}
               style={{ marginTop: hp("1.5%") ,width:20, height:20, opacity: 0.5}}
                />
-              <Text style={styles.subtitle1}>placelocation</Text>
+              <Text style={styles.subtitle1}>{vicinity}</Text>
               
-              <TouchableWithoutFeedback>
+              <TouchableWithoutFeedback onPress={OpenMapApi}>
               <Image
               source={require("../assets/icons/mapping.png")}
               style={{ marginTop: hp("2.5%") ,width:20, height:20, marginLeft: 'auto'}}
