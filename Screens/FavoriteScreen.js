@@ -65,13 +65,20 @@ export default function FavoriteScreen({ navigation }) {
             // console.log('itemsss',key)
             allBookmarks.push(item);
             setLoading(false);
-        });
+        })
         setBookmarkItems(allBookmarks)
       })
-      if (bookmarkItems.length <= 0){
-          setGetItems(true)
+      setTimeout(() => {
+        if (bookmarkItems.length > 0){
+          setGetItems(false)
           setLoading(false)
       }
+      else{
+        console.log(bookmarkItems.length)
+        setGetItems(true)
+        setLoading(false)
+      }
+      }, 5000);
     } 
     removeBookmark = (bookmarkItems) =>{
       var bookmark = firebase.database().ref('user/'+userId+'/bookmarks').child(bookmarkItems.name);

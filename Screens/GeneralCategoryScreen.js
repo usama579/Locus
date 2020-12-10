@@ -56,7 +56,8 @@ export default function GeneralCategoryScreen({ navigation }) {
   });
 
     fetchActivity = async ()=>{
-      firebase.database().ref('Activities').on('value', (snapshot)=> {
+      let fetch =  await firebase.database().ref('Activities');
+      fetch.on('value', (snapshot)=> {
      //const response = await getAllActvities()
      console.log("componentDidMount on catagory")
       let todosKeys=Object.keys(snapshot.val());

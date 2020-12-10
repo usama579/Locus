@@ -101,7 +101,7 @@ export default function ActivityInformationScreen({ navigation, route}) {
         console.log('removed')
         alert('UnBookmarked')
         if (fromFav){
-      navigation.navigate('FavoriteScreen')
+      navigation.goBack(null)
     }else{
       navigation.navigate('GeneralCategoryScreen')
     }
