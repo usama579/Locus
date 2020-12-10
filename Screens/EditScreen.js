@@ -225,7 +225,7 @@ else{
 }}
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Header />
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -435,7 +435,7 @@ style = {styles.maleContainer} color="#7D34E3" label="Female" value="Female" />
 
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

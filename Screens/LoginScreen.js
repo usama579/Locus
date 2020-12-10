@@ -64,20 +64,24 @@ export default function LoginScreen({ navigation }) {
         switch(error.code){
           case 'auth/user-not-found':
             seterrorMail("A user with that Email does not exist.");
+            setLoading(false)
             break; 
 
           case 'auth/invalid-email':
             seterrorMail("Please enter a valid Email address" );
+            setLoading(false)
               break; 
           case 'auth/wrong-password':
             seterrorPass("Incorrrect password!");
+            setLoading(false)
+
         }
       
       }
     }
     else {
       alert(' Please enter Email and password');
-      
+      setLoading(false)
     }
     
     };

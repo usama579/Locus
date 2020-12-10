@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, StatusBar, Platform, Image } from "react-native";
+import { StyleSheet, Text, View, StatusBar, Platform, Image, SafeAreaView } from "react-native";
 import Header from "../Components/Header";
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
@@ -97,7 +97,7 @@ fetchData();
 
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar
         barStyle="dark-content"
         hidden={false}
@@ -288,7 +288,7 @@ fetchData();
           </ScrollView>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

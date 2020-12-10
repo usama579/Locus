@@ -1,5 +1,6 @@
+import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, SafeAreaView, Image } from "react-native";
+import { StyleSheet, SafeAreaView, Image  } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -7,7 +8,7 @@ import {
 
 export default function Header() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>   
       <Image
         source={require("../assets/icons/headerlogo.png")}
         style={styles.headerLogo}

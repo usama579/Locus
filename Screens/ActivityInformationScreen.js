@@ -319,7 +319,7 @@ export default function ActivityInformationScreen({ navigation, route}) {
               <TouchableWithoutFeedback onPress={OpenMapApi}>
               <Image
               source={require("../assets/icons/mapping.png")}
-              style={{ marginTop: hp("2.5%") ,width:20, height:20, marginLeft: 'auto'}}
+              style={{ marginTop: hp("4.5%") ,width:20, height:20, marginLeft: 'auto',padding:5}}
                />
                </TouchableWithoutFeedback>
           </View>
