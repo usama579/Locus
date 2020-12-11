@@ -40,7 +40,7 @@ export default function HomeScreen({ navigation }) {
     fetchBookmarks = async ()=>{
       console.log('call')
      let allBookmarks=[];
-     let fetch = firebase.database().ref('user/'+userId).child('/bookmarks/');
+     let fetch = await firebase.database().ref('user/'+userId).child('/bookmarks/');
      fetch.on('value', (snapshot)=> {
              snapshot.forEach((childSnapshot)=> {
              let item = childSnapshot.val();

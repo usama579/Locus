@@ -49,11 +49,12 @@ export default function GeneralCategoryScreen({ navigation }) {
   const [activity, setActivity] = useState([]);
   const [userId, setUserId] = useState('')
   const [customActivity,setCustomActivity] = useState([]);
+  const [categoryIds,setCategoryIds] = useState([])
+
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-
     fetchActivity = async ()=>{
       let fetch =  await firebase.database().ref('Activities');
       fetch.on('value', (snapshot)=> {
@@ -64,12 +65,21 @@ export default function GeneralCategoryScreen({ navigation }) {
       setLoading(false);
     });
     }
-    // useFocusEffect(
-    //   React.useCallback(() => {
-    //     fetchActivity()
-    //     setLoading(true)
-    //   }, [])
-    // );
+    
+    fetchExistingVisitedIds = async () =>{
+      let allCategoryIds = []
+      let fetch = firebase.database().ref('user/'+userId).child('/visited/');
+   fetch.on('value', (snapshot)=> {
+            snapshot.forEach((childSnapshot)=> {
+            let item = childSnapshot.val();
+            let key = Object.keys(item)
+            // console.log('itemsss',key)
+            allCategoryIds.push(item);
+        })
+        setCategoryIds(allCategoryIds)
+      })
+    }
+    
 useEffect(()=>{
   fetchActivity()
       setLoading(true)
@@ -77,13 +87,24 @@ useEffect(()=>{
         if (value !== null && value !== '') {
           console.log("value:",value)
               setUserId(value)
+              fetchExistingVisitedIds()
         }
       })
 },[])
   if (!loaded) {
     return <AppLoading />;
   }
-
+  function getUnique (array){
+    var uniqueArray = [];
+    
+    // Loop through array values
+    for(i=0; i < array.length; i++){
+        if(uniqueArray.indexOf(array[i]) === -1) {
+            uniqueArray.push(array[i]);
+        }
+    }
+    return uniqueArray;
+}
   onChangeText = (text) => {
     setPass(text)
     setFilter(true)
@@ -146,16 +167,19 @@ useEffect(()=>{
             backImage={backImage}
             text={item}
             onPress={() =>{
-              // var interests = firebase.database().ref('user/'+userId).child('/visited');
+              categoryIds.push(item)
+              // var uniqueNames = [];
+              var uniqueIds = getUnique(categoryIds);
+              var visited = firebase.database().ref('user/'+userId).child('/visited');
               // let visit = interests.push()
-              // visit.set(item).then(()=>{
-              //   console.log('Visit ad')
+              visited.set(uniqueIds).then(()=>{
+                console.log('Visit ad',userId)
                 navigation.navigate("CategoryClickScreen", {
                   title: item,
                 })
-              // }).catch(() =>
-              //   console.log('Error')
-              // )}
+              }).catch(() =>
+                console.log('Error')
+              )
             }}
           />
           </View>

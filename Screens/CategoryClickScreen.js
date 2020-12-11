@@ -157,7 +157,6 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
         return 0;
         })
       }
-      
       if(selectedIndex !== 0){
         array = array.filter(function (item) {
           return (item.price_level && item.price_level <= selectedIndex)
