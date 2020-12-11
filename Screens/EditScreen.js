@@ -5,6 +5,7 @@ import {
   View,
   Image,
   ImageBackground,
+  ActivityIndicator,
   StatusBar,
   Platform,
   TextInput,
@@ -43,7 +44,13 @@ export default function EditScreen({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      getUserId(userProfile)
+      getUserId(value => {
+        if (value !== null && value !== '') {
+          console.log("value:",value)
+              setUserId(value)
+              fetchUserInfo()
+        }
+      })
     }, [])
   );
 //user attributes
@@ -55,7 +62,7 @@ const [DOB, setDOB] = useState();
 const [gend, setGend] = useState();
 const [userId, setUserId] = useState()
 const [values, setvalues] = useState([]);
-
+const [loading, setLoading] = useState(true);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
@@ -77,27 +84,19 @@ const [values, setvalues] = useState([]);
   }}
 
   fetchUserInfo = () =>{
-    let item;
     let fetch = firebase.database().ref('user/'+userId);
-    fetch.on('value', (snapshot)=> {
-             item = snapshot.val();
-             console.log('items:',item)
-         });
-         setNickname(item.nickname)
-              setMail(item.email)
-              setCity(item.city)
-              setDOB(item.DateOfBirth)
-              setGend(item.gender)
-         
+    fetch.once('value', (snapshot)=> {
+             let items = snapshot.val();
+             console.log('items once:',items)
+             setNickname(items.nickname)
+             setMail(items.email)
+             setCity(items.city)
+             setDOB(items.DateOfBirth)
+             setGend(items.gender)
+             setLoading(false)
+            });
   }
-
-  const userProfile = value => {
-    if (value !== null && value !== '') {
-          setUserId(value)
-          fetchUserInfo()
-    }
-  }
-
+ 
   // var user = firebase.auth().currentUser;
 
   // firebase.database().ref('user').child(user.uid).once('value').then((snapshot) => {
@@ -133,10 +132,6 @@ Edit = async() => {
     return user.reauthenticateWithCredential(cred);
   }
 
-
-  //////
-
-
 var user = firebase.auth().currentUser;
 if (user != null) {
 
@@ -160,14 +155,9 @@ changeEmail = (currentPassword, mail) => {
       console.log("Email updated!");
     }).catch((error) => { console.log(error); });
   }).catch((error) => { console.log(error); });
-}
-
-
-        
+}       
   }
-
-
-  
+ 
   if(city){
 
     await firebase
@@ -179,10 +169,7 @@ changeEmail = (currentPassword, mail) => {
 
         });
 
-
-
   }
-
 
 
   if(gend){
@@ -233,20 +220,21 @@ else{
           <Text style={styles.Recomend}>Edit Information</Text>
           <Image source={require("../assets/icons/edit.png")} />
         </View>
-
+        
+        {loading ? (
+          <ActivityIndicator
+            //visibility of Overlay Loading Spinner
+            visible={loading}
+            textContent={'Loading...'}
+            textStyle={{fontSize:20,color:'blue'}}
+          />
+        ) : (
         <View style={styles.signupCardContainer}>
           <View style={styles.inputsMainContainer}>
             <View style={styles.nickNameContainer}>
               <View style={styles.nickNameSubContainer}>
                 <Image source={require("../assets/icons/nickname.jpg")} />
 
-
-
-
-
-
-
- 
                 <TextInput
                 keyboardType="default"
                 style={styles.inputMail}
@@ -380,7 +368,7 @@ style = {styles.maleContainer} color="#7D34E3" label="Female" value="Female" />
             </View>
           </View>
         </View>
-
+        )}
 
         <View style={{flex: 1, flexDirection: 'row' , alignItems:'center', justifyContent:'center'}}>
         <TouchableOpacity

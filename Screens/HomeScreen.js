@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, StatusBar, Platform, Image, SafeAreaView } from "react-native";
+import { StyleSheet, Text, View, StatusBar, Platform, Image,FlatList,ActivityIndicator, SafeAreaView } from "react-native";
 import Header from "../Components/Header";
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
@@ -39,7 +39,7 @@ export default function HomeScreen({ navigation }) {
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
-
+  const [loading, setLoading] = useState(true);
   const bella = "https://pbs.twimg.com/media/C56DkeFWYAIarxw.jpg";
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
@@ -47,6 +47,64 @@ export default function HomeScreen({ navigation }) {
   const [place, setPlace] = useState("");
   const [category, setCategory] = useState("");
   const [values, setvalues] = useState("");
+  const [detailActivity, setDetailActivity] = useState([]);
+
+  fetchDetailActivity = async ()=>{
+    let allDetail=[];
+    firebase.database().ref('Activities').on('value', (snapshot)=> {
+            snapshot.forEach((childSnapshot)=> {
+            childSnapshot.forEach((subChildSnapshot)=> {
+              subChildSnapshot.forEach((multiSubChildSnapshot)=> {
+                let subItem = multiSubChildSnapshot.val();
+              allDetail.push(subItem);
+              });
+            });
+          });    
+             
+        console.log("allDetail:",allDetail)
+        allDetail.sort((a,b) => {
+          let d1=distance(a.geometry.location.lat,a.geometry.location.lng);
+          let d2=distance(b.geometry.location.lat,b.geometry.location.lng);
+          if(d1 < d2) 
+          return  -1;
+          else if(d2 <d1)
+          return 1;
+          else 
+          return 0;
+          })
+        const items = allDetail.slice(0, 10)
+        setDetailActivity(items)
+        setLoading(false);
+      })
+    
+  }
+
+  function distance(lat2, lon2) {
+    let lat1 = 24.753006
+    let lon1 = 46.674387
+    if ((lat1 == lat2) && (lon1 == lon2)) {
+      return 0;
+    }
+    else {
+      var radlat1 = Math.PI * lat1/180;
+      var radlat2 = Math.PI * lat2/180;
+      var theta = lon1-lon2;
+      var radtheta = Math.PI * theta/180;
+      var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+      if (dist > 1) {
+        dist = 1;
+      }
+      dist = Math.acos(dist);
+      dist = dist * 180/Math.PI;
+      dist = dist * 60 * 1.1515;
+      dist = dist * 1.609344 
+      return dist;
+    }
+  }
+
+  useEffect(()=>{
+    fetchDetailActivity()
+ },[])
 /* useEffect(() => {  */      
  /*  firebase.database().ref('TemproryEvent').child('1').once('value').then((snapshot) => {
 
@@ -231,61 +289,54 @@ fetchData();
 
         <View>
           <Text style={styles.othersLike}>Near to you</Text>
-
-          <ScrollView
-            style={{ marginTop: hp("0%") }}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            <View style={styles.cardFirstRow}>
+          {loading ? (
+          <ActivityIndicator
+            //visibility of Overlay Loading Spinner
+            visible={loading}
+            textContent={'Loading...'}
+            textStyle={{fontSize:20,color:'blue'}}
+          />
+        ) : (
+          <>
+          {(loading==false && detailActivity.length <= 0 ) ?
+          <View style={{alignSelf:'center'}}>
+          <Text style={{fontSize:20}}>No data found</Text>
+          </View>
+          :
+          <FlatList
+          data={detailActivity}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({item,index}) =>{
+            // item search in (bookmarkitem)
+            //const response= bookmarkedItems.some((selectedItem)=> selectedItem.name === item.name);
+            // const {image,name}=item
+            //console.log("componentDidMount on detail catagory",response) 
+          return (
+            // <View style={styles.cardFirstRow}>
               <HomeCard
-                image={bella}
-                title="Spice"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={emptystar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                // onPress2={() =>
-                //   navigation.navigate("ActivityInformationScreen")
-                // }
+                image={item.image}
+                title={item.name}
+                heart={null}
+                item={item}
+                index={index}
+                onPress2={() =>
+                  navigation.navigate("ActivityInformationScreen",{
+                    object: item,
+                    response:false
+                  }) 
+               }
               />
-
-              <HomeCard
-                image={bella}
-                title="Hardees"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={emptystar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                // onPress2={() =>
-                //   navigation.navigate("ActivityInformationScreen")
-                // }
-              />
-              <HomeCard
-                image={bella}
-                title="Bella Vita"
-                star1={star}
-                star2={star}
-                star3={star}
-                star4={star}
-                star5={halfstar}
-                subTitle1="Khayaban shahbaz (Karachi)"
-                subTitle2="Burgers Beverage Italian American Fast Food"
-                heart={emptyheart}
-                // onPress2={() =>
-                //   navigation.navigate("ActivityInformationScreen")
-                // }
-              />
-            </View>
-          </ScrollView>
+            // </View>
+           )
+          }
+          }
+          extraData={detailActivity}
+          keyExtractor={(item, index) => index}
+          />
+          }
+          </>
+        )} 
         </View>
       </ScrollView>
     </SafeAreaView>
