@@ -145,7 +145,7 @@ export default function FavoriteScreen({ navigation }) {
               navigation.navigate("ActivityInformationScreen",{
                 object: item,
                 response: true,
-                fromFav: true
+                fromFav: "Favourite"
               })}>
             <View style={styles.container1}>
               <Image source={{uri:item.image}} style={styles.cardImage} resizeMode={"cover"}/>

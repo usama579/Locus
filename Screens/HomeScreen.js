@@ -10,15 +10,7 @@ import {
 
 //import Homecardd from "../Components/Homecardd";
 import HomeCard from "../Components/HomeCard";
-
-//card images
-
-
-import kabab from "../assets/kababjees.png";
-import tandoor from "../assets/tandoor.png";
-import cafe from "../assets/cafe.png";
-import spice from "../assets/spice.png";
-import hardees from "../assets/hardees.png";
+import { useFocusEffect } from '@react-navigation/native';
 
 //star
 import star from "../assets/icons/star.png";
@@ -29,7 +21,7 @@ import emptystar from "../assets/icons/emptystar.png";
 import emptyheart from "../assets/icons/Heart.png";
 import { ScrollView } from "react-native-gesture-handler";
 
-
+import {getUserId} from '../apis/LocalDB'
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -40,14 +32,25 @@ export default function HomeScreen({ navigation }) {
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState('');
   const bella = "https://pbs.twimg.com/media/C56DkeFWYAIarxw.jpg";
-  const [name, setName] = useState("");
-  const [image, setImage] = useState("");
-  const [tryyy, settryy] = useState("");
-  const [place, setPlace] = useState("");
-  const [category, setCategory] = useState("");
-  const [values, setvalues] = useState("");
+  const [bookmarkedItems, setBookmarkedItems] = useState([])
   const [detailActivity, setDetailActivity] = useState([]);
+
+    fetchBookmarks = async ()=>{
+      console.log('call')
+     let allBookmarks=[];
+     let fetch = firebase.database().ref('user/'+userId).child('/bookmarks/');
+     fetch.on('value', (snapshot)=> {
+             snapshot.forEach((childSnapshot)=> {
+             let item = childSnapshot.val();
+             let key = Object.keys(item)
+             // console.log('itemsss',key)
+             allBookmarks.push(item);
+         });
+         setBookmarkedItems(allBookmarks)
+       })
+      } 
 
   fetchDetailActivity = async ()=>{
     let allDetail=[];
@@ -61,7 +64,6 @@ export default function HomeScreen({ navigation }) {
             });
           });    
              
-        console.log("allDetail:",allDetail)
         allDetail.sort((a,b) => {
           let d1=distance(a.geometry.location.lat,a.geometry.location.lng);
           let d2=distance(b.geometry.location.lat,b.geometry.location.lng);
@@ -76,7 +78,6 @@ export default function HomeScreen({ navigation }) {
         setDetailActivity(items)
         setLoading(false);
       })
-    
   }
 
   function distance(lat2, lon2) {
@@ -102,9 +103,17 @@ export default function HomeScreen({ navigation }) {
     }
   }
 
-  useEffect(()=>{
+ useFocusEffect(
+  React.useCallback(() => {
     fetchDetailActivity()
- },[])
+    getUserId(value => {
+      if (value !== null && value !== '') {
+            setUserId(value)
+            fetchBookmarks()
+      }
+  })
+  }, [])
+);
 /* useEffect(() => {  */      
  /*  firebase.database().ref('TemproryEvent').child('1').once('value').then((snapshot) => {
 
@@ -309,7 +318,7 @@ fetchData();
           showsHorizontalScrollIndicator={false}
           renderItem={({item,index}) =>{
             // item search in (bookmarkitem)
-            //const response= bookmarkedItems.some((selectedItem)=> selectedItem.name === item.name);
+            const response= bookmarkedItems.some((selectedItem)=> selectedItem.name === item.name);
             // const {image,name}=item
             //console.log("componentDidMount on detail catagory",response) 
           return (
@@ -317,13 +326,14 @@ fetchData();
               <HomeCard
                 image={item.image}
                 title={item.name}
-                heart={null}
+                heart={response == true ? 'red' : null}
                 item={item}
                 index={index}
                 onPress2={() =>
                   navigation.navigate("ActivityInformationScreen",{
                     object: item,
-                    response:false
+                    response:response,
+                    fromHome: 'Home'
                   }) 
                }
               />

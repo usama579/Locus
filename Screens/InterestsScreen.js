@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   ImageBackground,
   StatusBar,
   Platform,
+  FlatList,
   TextInput,
   TouchableOpacity,
 } from "react-native";
@@ -14,27 +15,78 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 import { AntDesign } from "@expo/vector-icons";
-
+import firebase from 'firebase'
+import 'firebase/database'
 import { useFonts } from "@use-expo/font";
 import { AppLoading } from "expo";
-import InterestsBox from "../Components/InterestsBox";
-
+import {getUserId} from '../apis/LocalDB'
 export default function LoginScreen({ navigation }) {
-  const [mail, setMail] = useState("");
-  const [pass, setPass] = useState("");
+  const [interests, setInterests] = useState([])
+  const [userId, setUserId] = useState("");
 
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
+  useEffect(()=>{
+    const datasource = [{"type":"swimming","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Gaming","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Reading","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Playing","isSelect":false,"selectedClass":"#f7f7f7"}]
+    setInterests(datasource)
+    getUserId(value => {
+      if (value !== null && value !== '') {
+        console.log("value:",value)
+            setUserId(value)
+      }
+    })
+  },[])
+
+  pushInterest = () =>{
+    let selected = []
+    interests.forEach(item => {
+     if (item.isSelect){
+      selected.push(item.type)
+      console.log(selected)
+      var interests = firebase.database().ref('user/'+userId).child('/interests');
+      interests.set(selected).then(()=>{
+        console.log('Interests ad')
+        navigation.navigate("HomeScreen")
+      }).catch(() =>
+        console.log('Error')
+      )
+}
+  
+})
+  }
+
+  onClick = (item,index) => {   
+       let array = [...interests]
+       let items = array[index]
+       items.isSelect = !items.isSelect
+       items.selectedClass = items.isSelect == true? "grey" : "#f7f7f7"
+       setInterests(array)
+    }
+  
+    renderItem = (item,index)=> {
+      return (
+        <TouchableOpacity onPress={() => onClick(item,index)}
+    style={[
+      styles.container,
+      {backgroundColor:item.selectedClass}
+    ]}
+  >
+        <Text style={{ fontWeight:'bold',color: item.isSelect ? '#fff' : '#000' }}>{item.type}</Text>
+    </TouchableOpacity>
+      )
+    }
 
   if (!loaded) {
     return <AppLoading />;
   }
 
   return (
+    
     <ImageBackground
       style={styles.loginBackgroundImage}
       source={require("../assets/backgroundImage.png")}
@@ -57,7 +109,7 @@ export default function LoginScreen({ navigation }) {
 
         <Text style={styles.prefereText}>What do you prefer?</Text>
 
-        <View style={styles.interestsBoxContainer}>
+        {/* <View style={styles.interestsBoxContainer}>
           <View style={styles.firstRow}>
             <InterestsBox text="Swimmming" />
             <InterestsBox text="Gaming" />
@@ -67,10 +119,19 @@ export default function LoginScreen({ navigation }) {
             <InterestsBox text="Reading" />
             <InterestsBox text="Playing" />
           </View>
-        </View>
+        </View> */}
+
+          <FlatList
+          data={interests}
+          renderItem={({item,index}) => renderItem(item,index)}
+          // keyExtractor = {item => item.id.toString()}
+          numColumns={2}
+          // keyExtractor = {item => item.id.toString()}
+          extraData = {interests}
+            />
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("HomeScreen")}
+          onPress={() => pushInterest()}
           style={styles.cardBottomCircle}
         >
           <AntDesign name="arrowright" size={16} color="#fff" />
@@ -157,4 +218,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: hp("-5%"),
   },
+  container: {
+    width: wp("35%"),
+    height: hp("15%"),
+    borderWidth: 0.1,
+    borderColor: "#707070",
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: hp("4%"),
+    marginLeft: wp("5%"),
+  },
+  list:{
+    backgroundColor:'#f7f7f7'
+  },
+  selected:{
+    backgroundColor:'#000'
+  }
 });

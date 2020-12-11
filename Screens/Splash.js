@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  FlatList
 } from 'react-native';
 import {getUserId} from '../apis/LocalDB';
 import {
@@ -30,7 +31,7 @@ export default function Splash ({navigation}) {
           }, 2000);
     }
     else{
-       navigation.navigate('LoginScreen')
+       navigation.navigate('Welcome')
   
     }
   }

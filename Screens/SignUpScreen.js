@@ -31,6 +31,7 @@ import female from "../assets/icons/female2.png";//GenderImages
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
+import { saveUserId } from "../apis/LocalDB";
 ////////////////////////////////////////
 ////////////////////////////////////////
 export default function SignUpScreen({ navigation }) {
@@ -214,9 +215,9 @@ console.log('callde')
                 city:city,
                 gender: gend,
                 DateOfBirth: DOB});
-               console.log('SignUp')
+               console.log('SignUp',response.user.uid)
+               saveUserId(response.user.uid)
           navigation.navigate("InterestsScreen")
-         
       }
    
     } catch (error) {

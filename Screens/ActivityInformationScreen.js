@@ -49,7 +49,7 @@ import { saveUserId } from "../apis/LocalDB";
     } */
 
 export default function ActivityInformationScreen({ navigation, route}) {
-  const { object,response,fromFav } = route.params;
+  const { object,response,fromFav,fromHome } = route.params;
   const {image,name,rating,features,vicinity,geometry}=object
   const {lat,lng} =geometry.location
   const [bookmark,setBookmark] = useState(response)
@@ -71,7 +71,12 @@ export default function ActivityInformationScreen({ navigation, route}) {
     .then(()=>{
       console.log('success',bookmarkItems.name)
       alert('Bookmarked')
-      navigation.navigate('GeneralCategoryScreen')
+      console.log('hhh',fromHome,'fff',fromFav)
+      if (fromHome === 'Home'){
+        navigation.goBack(null)
+      }else{
+        navigation.navigate('GeneralCategoryScreen')
+      }
     }).catch(()=>{
       console.log('error')
     })
@@ -83,7 +88,10 @@ export default function ActivityInformationScreen({ navigation, route}) {
       bookmark.remove().then(()=>{
         console.log('removed')
         alert('UnBookmarked')
-        if (fromFav){
+        if (fromFav === 'Favourite'){
+      navigation.goBack(null)
+    }
+    else if (fromHome === 'Home'){
       navigation.goBack(null)
     }else{
       navigation.navigate('GeneralCategoryScreen')

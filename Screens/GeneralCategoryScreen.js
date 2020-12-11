@@ -36,10 +36,8 @@ import { useFocusEffect } from '@react-navigation/native';
 //images
 import backImage from "../assets/cafeCat.png";
 import centerImage from "../assets/icons/cup.png";
-// import {getAllActvities} from "../apis/ActivityFunctions"
-import ModalButtons from "../Components/ModalButtons";
-import ModalButtons2 from "../Components/ModalButton2";
-import CityPicker2 from "../Components/CityPicker2";
+
+import {getUserId} from '../apis/LocalDB'
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
@@ -49,6 +47,7 @@ export default function GeneralCategoryScreen({ navigation }) {
   const [pass, setPass] = useState("");
   const [filter, setFilter] = useState(false);
   const [activity, setActivity] = useState([]);
+  const [userId, setUserId] = useState('')
   const [customActivity,setCustomActivity] = useState([]);
   const [loaded] = useFonts({
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
@@ -74,6 +73,12 @@ export default function GeneralCategoryScreen({ navigation }) {
 useEffect(()=>{
   fetchActivity()
       setLoading(true)
+      getUserId(value => {
+        if (value !== null && value !== '') {
+          console.log("value:",value)
+              setUserId(value)
+        }
+      })
 },[])
   if (!loaded) {
     return <AppLoading />;
@@ -140,11 +145,18 @@ useEffect(()=>{
             centerImage={centerImage}
             backImage={backImage}
             text={item}
-            onPress={() =>
-              navigation.navigate("CategoryClickScreen", {
-                title: item,
-              })
-            }
+            onPress={() =>{
+              // var interests = firebase.database().ref('user/'+userId).child('/visited');
+              // let visit = interests.push()
+              // visit.set(item).then(()=>{
+              //   console.log('Visit ad')
+                navigation.navigate("CategoryClickScreen", {
+                  title: item,
+                })
+              // }).catch(() =>
+              //   console.log('Error')
+              // )}
+            }}
           />
           </View>
           )

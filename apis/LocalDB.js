@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export async function saveUserId(item) {
-  AsyncStorage.setItem('user', JSON.stringify(item.uid))
+  AsyncStorage.setItem('user', JSON.stringify(item))
     .then(() => {
       console.log(
-        'data saved',item.city
+        'data saved'
       );
     })
     .catch((error) => {
