@@ -31,9 +31,32 @@ export default function LoginScreen({ navigation }) {
     MoskMedium500: require("../assets/fonts/MoskMedium500.ttf"),
     MoskBold700: require("../assets/fonts/MoskBold700.ttf"),
   });
+
+  fetchActivity = async ()=>{
+    let fetch =  await firebase.database().ref('Activities');
+    fetch.on('value', (snapshot)=> {
+    //const response = await getAllActvities()
+    console.log("componentDidMount on catagory")
+    let key = Object.keys(snapshot.val());
+    let data = []
+   key.forEach((item)=>{
+    let values = {}
+     values.name = item
+   data.push(values)
+  })
+  var result = data.map(function(el) {
+      var o = Object.assign({}, el);
+      o.isSelect = false
+      return o;
+    })
+    setInterests(result)
+  })
+  
+
+  }
+
   useEffect(()=>{
-    const datasource = [{"type":"swimming","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Gaming","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Reading","isSelect":false,"selectedClass":"#f7f7f7"},{"type":"Playing","isSelect":false,"selectedClass":"#f7f7f7"}]
-    setInterests(datasource)
+    fetchActivity()
     getUserId(value => {
       if (value !== null && value !== '') {
         console.log("value:",value)
@@ -46,8 +69,7 @@ export default function LoginScreen({ navigation }) {
     let selected = []
     interests.forEach(item => {
      if (item.isSelect){
-      selected.push(item.type)
-      console.log(selected)
+      selected.push(item.name)
       var interests = firebase.database().ref('user/'+userId).child('/interests');
       interests.set(selected).then(()=>{
         console.log('Interests ad')
@@ -64,7 +86,6 @@ export default function LoginScreen({ navigation }) {
        let array = [...interests]
        let items = array[index]
        items.isSelect = !items.isSelect
-       items.selectedClass = items.isSelect == true? "grey" : "#f7f7f7"
        setInterests(array)
     }
   
@@ -73,10 +94,10 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity onPress={() => onClick(item,index)}
     style={[
       styles.container,
-      {backgroundColor:item.selectedClass}
+      {backgroundColor:item.isSelect ? "grey" : "#f7f7f7"}
     ]}
   >
-        <Text style={{ fontWeight:'bold',color: item.isSelect ? '#fff' : '#000' }}>{item.type}</Text>
+        <Text style={{ fontWeight:'bold',color: item.isSelect ? '#fff' : '#000' }}>{item.name}</Text>
     </TouchableOpacity>
       )
     }
@@ -233,6 +254,6 @@ const styles = StyleSheet.create({
     backgroundColor:'#f7f7f7'
   },
   selected:{
-    backgroundColor:'#000'
+    backgroundColor:'grey'
   }
 });

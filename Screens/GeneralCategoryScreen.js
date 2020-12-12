@@ -66,19 +66,7 @@ export default function GeneralCategoryScreen({ navigation }) {
     });
     }
     
-    fetchExistingVisitedIds = async () =>{
-      let allCategoryIds = []
-      let fetch = firebase.database().ref('user/'+userId).child('/visited/');
-   fetch.on('value', (snapshot)=> {
-            snapshot.forEach((childSnapshot)=> {
-            let item = childSnapshot.val();
-            let key = Object.keys(item)
-            // console.log('itemsss',key)
-            allCategoryIds.push(item);
-        })
-        setCategoryIds(allCategoryIds)
-      })
-    }
+   
     
 useEffect(()=>{
   fetchActivity()
@@ -87,7 +75,6 @@ useEffect(()=>{
         if (value !== null && value !== '') {
           console.log("value:",value)
               setUserId(value)
-              fetchExistingVisitedIds()
         }
       })
 },[])
@@ -167,19 +154,9 @@ useEffect(()=>{
             backImage={backImage}
             text={item}
             onPress={() =>{
-              categoryIds.push(item)
-              // var uniqueNames = [];
-              var uniqueIds = getUnique(categoryIds);
-              var visited = firebase.database().ref('user/'+userId).child('/visited');
-              // let visit = interests.push()
-              visited.set(uniqueIds).then(()=>{
-                console.log('Visit ad',userId)
                 navigation.navigate("CategoryClickScreen", {
                   title: item,
                 })
-              }).catch(() =>
-                console.log('Error')
-              )
             }}
           />
           </View>

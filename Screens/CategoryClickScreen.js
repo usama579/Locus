@@ -52,7 +52,22 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
   const [outDoorSeat,setOutDoorSeat] = useState(false)
   const [takeOut,setTakeOut] = useState(false)
   const [delivery,setDelivery] = useState(false)
+  const [categoryIds, setCategoryIds] = useState()
   
+  fetchExistingVisitedIds = async () =>{
+    let allCategoryIds = []
+    let fetch = firebase.database().ref('user/'+userId).child('/visited/');
+ fetch.on('value', (snapshot)=> {
+          snapshot.forEach((childSnapshot)=> {
+          let item = childSnapshot.val();
+          let key = Object.keys(item)
+          // console.log('itemsss',key)
+          allCategoryIds.push(item);
+      })
+      setCategoryIds(allCategoryIds)
+    })
+  }
+
   fetchDetailActivity = async ()=>{
     let allDetail=[];
     firebase.database().ref('Activities/'+title+'/Venues').on('value', (snapshot)=> {
@@ -82,20 +97,30 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
 
   useEffect(()=>{
        fetchDetailActivity()
-       getUserId(user);
-    },[])
-
-    const user = value => {
-      if (value !== null && value !== '') {
-            console.log('value',value)
-            setUserId(value)
-            fetchBookmarks()
-      }
+       getUserId(value =>{
+        if (value !== null && value !== '') {
+          console.log('value',value)
+          setUserId(value)
+          fetchExistingVisitedIds()
+          fetchBookmarks()
     }
+       });
+    },[])
 
   if (!loaded) {
     return <AppLoading />;
   }
+  function getUnique (array){
+    var uniqueArray = [];
+    
+    // Loop through array values
+    for( let i=0; i < array.length; i++){
+        if(uniqueArray.indexOf(array[i]) === -1) {
+            uniqueArray.push(array[i]);
+        }
+    }
+    return uniqueArray;
+}
 
   function distance(lat1, lon1, lat2, lon2) {
     if ((lat1 == lat2) && (lon1 == lon2)) {
@@ -262,11 +287,22 @@ export default function CategoryClickScreen({ navigation, route, onPress2 }) {
                 heart={response == true ? 'red' : null}
                 item={item}
                 index={index}
-                onPress2={() =>
+                onPress2={() => {
+                  categoryIds.push(item.place_id)
+                  // var uniqueNames = [];
+                  var uniqueIds = getUnique(categoryIds);
+                  var visited = firebase.database().ref('user/'+userId).child('/visited');
+                  // let visit = interests.push()
+                  visited.set(uniqueIds).then(()=>{
+                    console.log('Visit ad',userId)
                   navigation.navigate("ActivityInformationScreen",{
                     object: item,
                     response:response
-                  }) 
+                  })
+                }).catch(
+                  console.log('Error')
+                )
+                }
                }
               />
             // </View>
