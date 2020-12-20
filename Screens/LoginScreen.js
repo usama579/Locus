@@ -52,7 +52,7 @@ export default function LoginScreen({ navigation }) {
         const response = await firebase.auth().signInWithEmailAndPassword(mail ,pass);
         if (response){
           console.log(response.user.uid)
-          userInfo = response.user
+          userInfo = response.user.uid
           console.log('kmsdaklfn',userInfo.DateOfBirth,'name',userInfo.nickname,userInfo.city,userInfo.gender,userInfo.email)
           saveUserId(userInfo)
           setLoading(false)
